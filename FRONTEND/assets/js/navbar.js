@@ -18,6 +18,10 @@ function renderNavbar(){
     )
     .join("");
 
+    const botonSesion = Auth.estaLogueado()
+        ? `<a href="profile.html" class="btn btn-outline-light rounded-pill px-4">Mi Página</a>`
+        : `<a href="login.html" class="btn btn-outline-light rounded-pill px-4">Iniciar Sesión</a>`;
+
     return `
         <nav class="navbar navbar-expand-lg navbar-dark bg-navy py-3">
             <div class="container">
@@ -32,7 +36,7 @@ function renderNavbar(){
                     ${items}
                 </ul>
                 <div>
-                <a href="login.html" class="btn btn-outline-light rounded-pill px-4">Iniciar Sesión</a>
+                ${botonSesion}
                 </div>
             </div>
             </div>
