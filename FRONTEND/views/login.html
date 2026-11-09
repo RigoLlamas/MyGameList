@@ -63,7 +63,7 @@
             }
         </style>
         
-
+        <!--Script para cambiar entre formularios-->
         <script>
             function toggleForms(){
                 let form_login = document.getElementById('formLogin'),
@@ -79,7 +79,18 @@
                 }
             }
         </script>
+        <!--Script para guardar la sesion-->
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('formLogin').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    localStorage.setItem('usuario', e.target.email.value);
+                    window.location.href = 'profile.html';
+                });
+            });
+        </script>
 
+        <script src="../assets/js/auth.js" defer></script>
         <script src="../assets/js/navbar.js" defer></script>
 
     </head>
@@ -109,8 +120,8 @@
                         Correo:<br><input type="email" name="email" required="true" value="test@correo.com"><br>
                         Contrasena:<br><input type="password" name="password" required="true"><br>
                         Confirma Contrasena:<br><input type="password" name="confirm_password" required="true"><br>
-                        Fecha de Nacimiento:<br><input type="date", name="birthday", required="true"><br>
-                        Foto de Perfil (Opcional):<br><input type="file", name="avatar", required="false">
+                        Fecha de Nacimiento:<br><input type="date" name="birthday" required="true"><br>
+                        Foto de Perfil (Opcional):<br><input type="file" name="avatar">
                         <p class="card-text text-center">
                             <input type="submit" class="btn btn-primary" value="Crear Cuenta">
                             <br>
