@@ -19,7 +19,8 @@ function renderNavbar(){
     .join("");
 
     const botonSesion = Auth.estaLogueado()
-        ? `<a href="profile.html" class="btn btn-outline-light rounded-pill px-4">Mi Página</a>`
+        ? `<a href="profile.html" class="btn btn-outline-light rounded-pill px-4">Mi Página</a>
+           <button id="btnLogout" type="button" class="btn btn-danger rounded-pill px-4 ms-2" data-bs-toggle="modal" data-bs-target="#logout">Cerrar Sesión</button>`
         : `<a href="login.html" class="btn btn-outline-light rounded-pill px-4">Iniciar Sesión</a>`;
 
     return `
@@ -40,8 +41,42 @@ function renderNavbar(){
                 </div>
             </div>
             </div>
+
+            <!--Logout Modal-->
+            <div class="modal" id="logout">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Cerrar Sesion</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        Seguro que desea cerrar sesion?
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary"  id="btnConfirmLogout">Aceptar</button>
+                    </div>
+
+                    </div>
+                </div>
+            </div>
         </nav>
     `
 }
-
 document.getElementById("navbar").innerHTML = renderNavbar();
+
+// Cerrar sesión (el botón solo existe si hay usuario logueado)
+const btnConfirmLogout = document.getElementById("btnConfirmLogout");
+if (btnConfirmLogout) {
+    btnConfirmLogout.addEventListener("click", () => {
+        Auth.cerrarSesion();
+        window.location.href = "index.html";
+    });
+}
