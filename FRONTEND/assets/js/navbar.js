@@ -19,54 +19,61 @@ function renderNavbar(){
     .join("");
 
     const botonSesion = Auth.estaLogueado()
-        ? `<a href="profile.html" class="btn btn-outline-light rounded-pill px-4">Mi Página</a>
-           <button id="btnLogout" type="button" class="btn btn-danger rounded-pill px-4 ms-2" data-bs-toggle="modal" data-bs-target="#logout">Cerrar Sesión</button>`
+        ? `
+            <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle active border-bottom border-primary border-2" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-circle fs-3 me-2"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="dropdownUser">
+                    <li><a class="dropdown-item active" href="profile.html">Ver Perfil</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#logout">Cerrar Sesión</a></li>
+                </ul>
+            </div>
+        `
         : `<a href="login.html" class="btn btn-outline-light rounded-pill px-4">Iniciar Sesión</a>`;
 
     return `
-        <nav class="navbar navbar-expand-lg navbar-dark bg-navy py-3">
-            <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold fs-4" href="index.html">
-                <i class="bi bi-controller fs-3"></i> MyGameList
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
-                    ${items}
-                </ul>
-                <div>
-                ${botonSesion}
-                </div>
-            </div>
-            </div>
-
-            <!--Logout Modal-->
-            <div class="modal" id="logout">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-
-                    <!-- Modal Header -->
-                    <div class="modal-header">
-                        <h4 class="modal-title">Cerrar Sesion</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-
-                    <!-- Modal body -->
-                    <div class="modal-body">
-                        Seguro que desea cerrar sesion?
-                    </div>
-
-                    <!-- Modal footer -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-primary"  id="btnConfirmLogout">Aceptar</button>
-                    </div>
-
+            <nav class="navbar navbar-expand-lg navbar-dark bg-navy py-3">
+                <div class="container">
+                    <a class="navbar-brand d-flex align-items-center gap-2 fw-bold fs-4" href="index.html">
+                        <i class="bi bi-controller fs-3"></i> MyGameList
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                            ${items}
+                        </ul>
+                        ${botonSesion}
                     </div>
                 </div>
-            </div>
+                <!--Logout Modal-->
+                <div class="modal" id="logout">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h4 class="modal-title">Cerrar Sesion</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                            Seguro que desea cerrar sesion?
+                        </div>
+
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-primary"  id="btnConfirmLogout">Aceptar</button>
+                        </div>
+
+                        </div>
+                    </div>
+                </div>
         </nav>
     `
 }
