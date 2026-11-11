@@ -73,7 +73,7 @@
                     </div>
                     <!-- Botón de Editar Perfil en la esquina -->
                     <div>
-                        <button type="button" class="btn btn-outline-secondary rounded-pill px-3 d-inline-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-3 d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalEditarPerfil">
                             <i class="bi bi-pencil-square"></i> Editar Perfil
                         </button>
                     </div>
@@ -329,6 +329,60 @@
                 </div>
             </div>
         </main>
+
+        <!-- Modal Editar Perfil -->
+        <div class="modal fade" id="modalEditarPerfil" tabindex="-1" aria-labelledby="modalEditarPerfilLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow rounded-4">
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <h5 class="modal-title fw-bold" id="modalEditarPerfilLabel">
+                            <i class="bi bi-person-gear me-2 text-primary"></i>Editar Perfil
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <form>
+                        <div class="modal-body pt-3">
+                            <!-- Cambio de Avatar -->
+                            <div class="d-flex align-items-center gap-3 mb-4">
+                                <div class="avatar-placeholder text-secondary flex-shrink-0" style="width: 80px; height: 80px;">
+                                    <i class="bi bi-person fs-2 opacity-75"></i>
+                                </div>
+                                <div>
+                                    <label class="form-label fw-semibold small mb-1">Foto de Perfil</label>
+                                    <input type="file" class="form-control form-control-sm" accept="image/*" />
+                                    <div class="form-text small">Formatos permitidos: JPG, PNG (máx. 2MB).</div>
+                                </div>
+                            </div>
+
+                            <!-- Nombre de Usuario -->
+                            <div class="mb-3">
+                                <label for="inputUsername" class="form-label fw-semibold small">Nombre de Usuario</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-secondary"><i class="bi bi-at"></i></span>
+                                    <input type="text" class="form-control" id="inputUsername" value="Jugador123" required />
+                                </div>
+                            </div>
+
+                            <!-- Biografía / Estado -->
+                            <div class="mb-3">
+                                <label for="inputBio" class="form-label fw-semibold small">Biografía</label>
+                                <textarea class="form-control" id="inputBio" rows="3" placeholder="Cuéntanos un poco sobre tus gustos en videojuegos...">Gamer apasionado por los RPGs y juegos de mundo abierto.</textarea>
+                            </div>
+
+                            <!-- Fecha de Nacimiento -->
+                            <div class="mb-3">
+                                <label for="inputBirthdate" class="form-label fw-semibold small">Fecha de Nacimiento</label>
+                                <input type="date" class="form-control" id="inputBirthdate" value="2000-03-15" />
+                            </div>
+                        </div>
+                        <div class="modal-footer border-top-0 pt-0">
+                            <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <!-- Bootstrap JavaScript Bundle (includes Popper) -->
         <script
