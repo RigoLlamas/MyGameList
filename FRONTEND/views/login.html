@@ -12,56 +12,6 @@
   
          <!-- CSS Centralizado del Proyecto -->
         <link rel="stylesheet" href="../assets/css/styles.css">
-
-        <style>
-            body{
-                background: linear-gradient(to bottom right, lightgray, white);
-            }
-            .card{
-                margin:10px;
-                border: 1px solid black;
-                padding: 10px;
-            }
-            .form-title{
-                font-family: Arial, Helvetica, sans-serif;
-            }
-            input[type="text"]{
-                border-radius: 7px;
-                border-color: lightgray;
-                opacity: 0.5;
-                margin:10px;
-            }
-            input[type="password"]{
-                border-radius: 7px;
-                border-color: lightgray;
-                opacity: 0.5;
-                margin:10px;
-            }
-            input[type="email"]{
-                border-radius: 7px;
-                border-color: lightgray;
-                opacity: 0.5;
-                margin:10px;
-            }
-            input[type="date"]{
-                border-radius: 7px;
-                border-color: lightgray;
-                opacity: 0.5;
-                margin:10px;
-            }
-            input[type="file"]{
-                border-radius: 7px;
-                border-color: lightgray;
-                opacity: 0.5;
-                margin:10px;
-            }
-            input[type="button"]{
-                margin:10px;
-                border: 1px;
-                padding-left: 30px;
-                padding-right: 30px;
-            }
-        </style>
         
         <!--Script para cambiar entre formularios-->
         <script>
@@ -104,39 +54,97 @@
 
     </head>
 
-    <body class="d-flex flex-column min-vh-100">
+    <body class="d-flex flex-column min-vh-100 bg-light">
         <header class="w-100">
             <div id="navbar"></div>
         </header>
-        <main class="flex-grow-1 d-flex align-items-center justify-content-center">
-            <div class="card">
+        <main class="flex-grow-1 d-flex align-items-center justify-content-center my-4 my-md-5">
+            <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-body">
+                    <!--Login-->
                     <form id="formLogin" action="">
-                        <h1 class="form-title">Iniciar Sesion</h1>
-                        Correo:<br><input type="email" name="email" required="true" value="diego@correo.com"><br>
-                        Contrasena:<br><input type="password" name="password" required="true"><br>
+                        <div class="text-center mb-4">
+                            <i class="bi bi-controller text-primary fs-1"></i>
+                            <h2 class="fw-bold mt-2 mb-1">Iniciar Sesión</h2>
+                            <p class="text-secondary small mb-0">Bienvenido de vuelta a MyGameList</p>
+                        </div>
+                            <!--Correo-->
+                            <div class="mb-3">
+                                <label for="correo" class="form-label fw-semibold small">Correo:</label>
+                                <div class="input-group">
+                                    <input id="correo" class="form-control" type="email" name="email" required="true" value="diego@correo.com"><br>
+                                </div>
+                            </div>
+                            <!--Contrasena-->
+                            <div class="mb-3">
+                                <label for="psswd" class="form-label fw-semibold small">Contrasena:</label>
+                                <div class="input-group">
+                                    <input id="psswd" class="form-control" type="password" name="password" required="true"><br>
+                                </div>
+                            </div>
                         <p class="card-text text-center">
-                            <input type="submit" class="btn btn-primary" value="Iniciar Sesion">
+                            <input type="submit" class="form-control btn btn-primary rounded-pill px-4" value="Iniciar Sesion">
                             <br>
                             No tienes una cuenta?
                             <br>
-                            <input type="button" class="btn btn-secondary" value="Crea una cuenta" onclick="toggleForms()">
+                            <input type="button" class="form-control btn btn-secondary rounded-pill px-4" value="Crea una cuenta" onclick="toggleForms()">
                         </p>
                     </form>
+                    <!--Register-->
                     <form id="formRegister" action="" style="display: none;">
-                        <h1 class="form-title">Crear Cuenta</h1>
-                        Nombre:<br><input type="text" name="name" required="true" value="Diego Alpizar"><br>
-                        Correo:<br><input type="email" name="email" required="true" value="test@correo.com"><br>
-                        Contrasena:<br><input type="password" name="password" required="true"><br>
-                        Confirma Contrasena:<br><input type="password" name="confirm_password" required="true"><br>
-                        Fecha de Nacimiento:<br><input type="date" name="birthday" required="true"><br>
-                        Foto de Perfil (Opcional):<br><input type="file" name="avatar">
+                        <div class="text-center mb-4">
+                            <i class="bi bi-controller text-primary fs-1"></i>
+                            <h2 class="fw-bold mt-2 mb-1">Crear Cuenta</h2>
+                            <p class="text-secondary small mb-0">Bienvenido a MyGameList</p>
+                        </div>
+                            <!--Nombre-->
+                            <div class="mb-3">
+                                <label for="register_name" class="form-label fw-semibold small">Nombre:</label>
+                                <div class="input-group">
+                                    <input id="register_name" class="form-control" type="text" name="name" required="true" value="Diego Alpizar"><br>
+                                </div>
+                            </div>
+                            <!--Correo-->
+                            <div class="mb-3">
+                                <label for="register_email" class="form-label fw-semibold small">Correo:</label>
+                                <div class="input-group">
+                                    <input id="register_email" class="form-control" type="email" name="email" required="true" value="test@correo.com"><br>
+                                </div>
+                            </div>
+                            <!--Contrasena-->
+                            <div class="mb-3">
+                                <label for="register_password" class="form-label fw-semibold small">Contrasena:</label>
+                                <div class="input-group">
+                                    <input id="register_password" class="form-control" type="password" name="password" required="true"><br>
+                                </div>
+                            </div>
+                            <!--Confirma contrasena-->
+                            <div class="mb-3">
+                                <label for="register_confirm_password" class="form-label fw-semibold small">Confirma Contrasena:</label>
+                                <div class="input-group">
+                                    <input id="register_confirm_password" type="password" class="form-control" name="confirm_password" required="true"><br>
+                                </div>
+                            </div>
+                            <!--Fecha Nacimiento-->
+                            <div class="mb-3">
+                                <label for="register_birthday" class="form-label fw-semibold small">Fecha de Nacimiento:</label>
+                                <div class="input-group">
+                                    <input id="register_birthday" type="date" class="form-control" name="birthday" required="true"><br>
+                                </div>
+                            </div>
+                            <!--Foto de perfil-->
+                            <div class="mb-3">
+                                <label for="register_picture" class="form-label fw-semibold small"> Foto de Perfil (opcional)</label>
+                                <div class="input-group">
+                                    <input type="file" id="register_picture" class="form-control" name="avatar">
+                                </div>
+                            </div>
                         <p class="card-text text-center">
-                            <input type="submit" class="btn btn-primary" value="Crear Cuenta">
+                            <input type="submit" class="form-control btn btn-primary  rounded-pill px-4" value="Crear Cuenta">
                             <br>
                             Ya tienes una cuenta?
                             <br>
-                            <input type="button" class="btn btn-secondary" value="Inicia Sesion" onclick="toggleForms()">
+                            <input type="button" class="form-control btn btn-secondary  rounded-pill px-4" value="Inicia Sesion" onclick="toggleForms()">
                         </p>
                     </form>
                 </div>
