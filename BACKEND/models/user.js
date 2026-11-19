@@ -1,5 +1,6 @@
 const fs = require('fs')
-let users = JSON.parse(fs.readFileSync('./database/users.json'))
+const path = require('path')
+let users = JSON.parse(fs.readFileSync(path.join(__dirname, '../database/users.json')));
 
 function getNextUserId(){
     if(users.length === 0){
@@ -85,9 +86,6 @@ class User{
         if(userPsswd.length < 8){
             throw new UserException("Contrasena debe tener al menos 8 caracteres");
         }
-        if (users.find(storedUser => storedUser.password === userPsswd)) {
-            throw new UserException("Contraseña ya está en uso");
-        }
         this.#password = userPsswd;
     }
 
@@ -116,10 +114,10 @@ class User{
         throw new UserException("Fecha de entrada se asigna en automatico");
     }
 
-    get friend(){
+    get friends(){
         return this.#friends;
     }
-    set friend(value){
+    set friends(value){
         throw new UserException("Arreglo de amigos se crea en automatico");
     }
 
@@ -128,6 +126,65 @@ class User{
     }
     set favorites(value){
         throw new UserException("Arreglo de favoritos se crea en automatico");
+    }
+
+
+    static validate(attribute, value, id){
+        if(attribute === "name"){
+            if(typeof value != "string"){
+                throw new UserException("Nombre de usuario debe ser una cadena de texto");
+            }
+            if(!value){
+                throw new UserException("Nombre de usuario no puede estar vacio");
+            }
+        }
+        if(attribute === "email"){
+            if(typeof value != "string"){
+                throw new UserException("Email debe ser una cadena de texto");
+            }
+            if(!value){
+                throw new UserException("Email de usuario no puede estar vacio");
+            }
+            if(users.find(storedUser => storedUser.email === value && storedUser.id !== id)){
+                throw new UserException("Email ya esta en uso");
+            }
+        }
+        if(attribute === "password"){
+            if(typeof value != "string"){
+                throw new UserException("Contrasena debe ser una cadena de texto");
+            }
+            if(!value){
+                throw new UserException("Contrasena no puede estar vacio");
+            }
+            if(value.length < 8){
+                throw new UserException("Contrasena debe tener al menos 8 caracteres");
+            }
+        }
+        if(attribute === "birthday"){
+            if(typeof value != "string"){
+                throw new UserException("Dia de nacimiento debe ser string");
+            }
+            if(!value){
+                throw new UserException("Dia de nacimiento no puede estar vacio");
+            }
+            const fecha = new Date(value + "T00:00:00");
+            if (isNaN(fecha.getTime())) {
+            throw new UserException("Dia de nacimiento no es una fecha valida");
+            }
+        }
+    }
+
+    toObj(){
+        return {
+            id: this.id,
+            name: this.name,
+            email: this.email,
+            password: this.password,
+            birthday: this.birthday,
+            joined_at: this.joined_at,
+            friends: this.friends,
+            favorites: this.favorites
+        };
     }
 }
 
