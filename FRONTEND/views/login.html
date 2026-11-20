@@ -28,17 +28,7 @@
                     form_register.style.display = 'none';
                 }
             }
-        </script>
-        <!--Script para guardar la sesion-->
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('formLogin').addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    localStorage.setItem('usuario', e.target.email.value);
-                    window.location.href = 'profile.html';
-                });
-            });
-        </script>
+        </script>        
         <!--Lector de modo registro-->
         <script>
             document.addEventListener('DOMContentLoaded', () => {
@@ -48,8 +38,10 @@
                 }
             });
         </script>
-
-        <script src="../assets/js/auth.js" defer></script>
+        <!--JS de la autenticacion de usuario-->
+        <script src="../controllers/env.js" defer></script>
+        <script src="../controllers/auth_controller.js" defer></script>
+        <!--JS de la Navbar dinamica-->
         <script src="../assets/js/navbar.js" defer></script>
 
     </head>

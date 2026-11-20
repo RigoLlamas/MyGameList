@@ -176,7 +176,8 @@ function updateUser(id, obj_new_info){
         "name",
         "email",
         "password",
-        "birthday"
+        "birthday",
+        "bio"
     ]
     let successful = false;
 

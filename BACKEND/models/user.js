@@ -25,6 +25,7 @@ class User{
     #joined_at;
     #friends;
     #favorites;
+    #bio;
 
     constructor(userName, userMail, userPsswd, userBday){
         this.#id = getNextUserId();
@@ -35,6 +36,7 @@ class User{
         this.#joined_at = new Date();
         this.#friends = new Array();
         this.#favorites = new Array();
+        this.#bio = "";
     }
     
     get id(){
@@ -128,6 +130,18 @@ class User{
         throw new UserException("Arreglo de favoritos se crea en automatico");
     }
 
+    get bio(){
+        return this.#bio;
+    }
+    set bio(value){
+        if(typeof value != "string"){
+            throw new UserException("Biografia debe ser un string");
+        }
+        if(value.length > 300){
+            throw new UserException("Biografia no puede exceder 300 caracteres");
+        }
+        this.#bio = value;
+    }
 
     static validate(attribute, value, id){
         if(attribute === "name"){
@@ -172,6 +186,14 @@ class User{
             throw new UserException("Dia de nacimiento no es una fecha valida");
             }
         }
+        if(attribute === "bio"){
+            if(typeof value != "string"){
+                throw new UserException("Biografia debe ser un string")
+            }
+            if(value.length > 300){
+                throw new UserException("Biografia no puede exceder 300 caracteres")
+            }
+        }
     }
 
     toObj(){
@@ -183,7 +205,8 @@ class User{
             birthday: this.birthday,
             joined_at: this.joined_at,
             friends: this.friends,
-            favorites: this.favorites
+            favorites: this.favorites,
+            bio: this.bio
         };
     }
 }

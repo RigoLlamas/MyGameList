@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "id": 1,
+    "name": "Diego Alpizar",
+    "email": "diego@correo.com",
+    "password": "123456789",
+    "birthday": "2000-03-30T06:00:00.000Z",
+    "joined_at": "2026-11-20T02:39:18.502Z",
+    "friends": [],
+    "favorites": [],
+    "bio": ""
+  }
+]

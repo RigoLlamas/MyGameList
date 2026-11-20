@@ -18,7 +18,7 @@ function renderNavbar(){
     )
     .join("");
 
-    const botonSesion = Auth.estaLogueado()
+    const botonSesion = sessionStorage.user
         ? `
             <div class="dropdown">
                     <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle active border-bottom border-primary border-2" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
@@ -82,8 +82,5 @@ document.getElementById("navbar").innerHTML = renderNavbar();
 // Cerrar sesión (el botón solo existe si hay usuario logueado)
 const btnConfirmLogout = document.getElementById("btnConfirmLogout");
 if (btnConfirmLogout) {
-    btnConfirmLogout.addEventListener("click", () => {
-        Auth.cerrarSesion();
-        window.location.href = "index.html";
-    });
+    btnConfirmLogout.addEventListener("click", logout);
 }

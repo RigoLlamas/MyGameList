@@ -17,8 +17,11 @@
 
         <!-- CSS Centralizado del Proyecto -->
         <link rel="stylesheet" href="../assets/css/styles.css" />
+        
+        <!--JS de la autenticacion de usuario-->
+        <script src="../controllers/env.js" defer></script>
+        <script src="../controllers/auth_controller.js" defer></script>
         <!--JS de la barra de navegacion-->
-        <script src="../assets/js/auth.js" defer></script>
         <script src="../assets/js/navbar.js" defer></script>
     </head>
 
@@ -39,12 +42,12 @@
                             <i class="bi bi-person fs-1 opacity-75"></i>
                         </div>
                         <div>
-                            <h2 class="fw-bold mb-1">Jugador123</h2>
-                            <p class="text-secondary mb-1">
-                                <i class="bi bi-calendar3 me-1"></i> Miembro desde: Ene 2025
+                            <h2 id="user_name" class="fw-bold mb-1">Jugador123</h2>
+                            <p  class="text-secondary mb-1">
+                                <i class="bi bi-calendar3 me-1"></i>Miembro desde: <span id="user_joined_at">Ene 2025</span>
                             </p>
-                            <p class="text-secondary mb-0">
-                                <i class="bi bi-cake2 me-1"></i> Fecha de nacimiento: 15/03/2000
+                            <p  class="text-secondary mb-0">
+                                <i class="bi bi-cake2 me-1"></i> Fecha de nacimiento: <span id="user_birthday">15/03/2000</span>
                             </p>
                         </div>
                     </div>
@@ -317,7 +320,7 @@
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
-                    <form>
+                    <form id="formEditProfile">
                         <div class="modal-body pt-3">
                             <!-- Cambio de Avatar -->
                             <div class="d-flex align-items-center gap-3 mb-4">
@@ -336,23 +339,32 @@
                                 <label for="inputUsername" class="form-label fw-semibold small">Nombre de Usuario</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light text-secondary"><i class="bi bi-at"></i></span>
-                                    <input type="text" class="form-control" id="inputUsername" value="Jugador123" required />
+                                    <input name="name" type="text" class="form-control" id="inputUsername" value="Jugador123" required />
                                 </div>
                             </div>
 
                             <!-- Biografía / Estado -->
                             <div class="mb-3">
                                 <label for="inputBio" class="form-label fw-semibold small">Biografía</label>
-                                <textarea class="form-control" id="inputBio" rows="3" placeholder="Cuéntanos un poco sobre tus gustos en videojuegos...">Gamer apasionado por los RPGs y juegos de mundo abierto.</textarea>
+                                <textarea name="bio" class="form-control" id="inputBio" rows="3" placeholder="Cuéntanos un poco sobre tus gustos en videojuegos...">Gamer apasionado por los RPGs y juegos de mundo abierto.</textarea>
                             </div>
 
                             <!-- Fecha de Nacimiento -->
                             <div class="mb-3">
                                 <label for="inputBirthdate" class="form-label fw-semibold small">Fecha de Nacimiento</label>
-                                <input type="date" class="form-control" id="inputBirthdate" value="2000-03-15" />
+                                <input name="birthday" type="date" class="form-control" id="inputBirthdate" value="2000-03-15" />
+                            </div>
+
+                            <!-- Contrasena -->
+                            <div class="mb-3">
+                                <label for="inputPassword" class="form-label fw-semibold small">Contrasena</label>
+                                <input type="password" class="form-control" id="inputPassword"/>
                             </div>
                         </div>
                         <div class="modal-footer border-top-0 pt-0">
+                            <button type="button" id="btnOpenDelete" class="btn btn-outline-danger rounded-pill px-4 me-auto">
+                                <i class="bi bi-trash3 me-1"></i>Eliminar cuenta
+                            </button>
                             <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
                             <button type="submit" class="btn btn-primary rounded-pill px-4">Guardar Cambios</button>
                         </div>
@@ -360,6 +372,27 @@
                 </div>
             </div>
         </div>
+        <!-- Modal Confirmar Eliminación -->
+        <div class="modal fade" id="modal_delete_user" tabindex="-1" aria-labelledby="modalDeleteLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow rounded-4">
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <h5 class="modal-title fw-bold text-danger" id="modalDeleteLabel">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Eliminar cuenta
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-0">¿Seguro que deseas eliminar tu cuenta? Esta acción no se puede deshacer.</p>
+                    </div>
+                    <div class="modal-footer border-top-0 pt-0">
+                        <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" id="button_confirm_delete" class="btn btn-danger rounded-pill px-4">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <!-- Bootstrap JavaScript Bundle (includes Popper) -->
         <script
