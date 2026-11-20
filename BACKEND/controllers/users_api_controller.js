@@ -179,24 +179,25 @@ function updateUser(id, obj_new_info){
         "birthday",
         "bio"
     ]
-    let successful = false;
-
     if(!user_mod){
         throw new UserException("ID Usuario No Existe")
     }
 
+    const changes = {} //Reolector de cambios
     for(let attribute in obj_new_info){
         if(validAttributes.includes(attribute)){
             if(user_mod[attribute] !== obj_new_info[attribute]){
                 User.validate(attribute, obj_new_info[attribute], id);
-                user_mod[attribute] = obj_new_info[attribute];
-                successful = true;
+                changes[attribute] = obj_new_info[attribute]
             }
         }
     }
-    if(!successful){
-        throw new UserException("No se realizaron modificaciones");
+    
+    if(Object.keys(changes).length === 0){ //Los atributos a cambiar son 0?
+        throw new UserException("No se realizaron modificaciones") //Arroja excepcion
     }
+
+    Object.assign(user_mod, changes) //Asigna los cambios al usuario a modificar
     return true;
 }
 
