@@ -34,14 +34,28 @@ function logout(){
 
 function register(){
     event.preventDefault();
-    let data = new FormData(event.target);
+    let data = Object.fromEntries(new FormData(event.target).entries());
+
+    //Validaciones
+    if(data.password.length < 8){
+        alert("Contrasena no puede se menor a 8 caracteres");
+        return;
+    }
+    if(data.password != data.confirm_password){
+        alert("Contrasenas no son iguales");
+        return;
+    }
+    if(new Date(data.birthday) > new Date()){
+        alert("La fecha de nacimiento no puede ser futura")
+        return;
+    }
 
     fetch('/users', {
         method: 'POST',
         headers: {
             'Content-Type':'application/json'
         },
-        body: JSON.stringify(Object.fromEntries(data.entries()))
+        body: JSON.stringify(data)
     })
     .then(response => {
         if(!response.ok){
