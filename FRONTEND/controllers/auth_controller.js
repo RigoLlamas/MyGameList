@@ -21,6 +21,7 @@ function login(){
     })
     .catch(err => {
         console.error("Error en Login:", err);
+        alert("Error inciando sesion: " + err.message);
     })
 }
 let formLogin = document.getElementById('formLogin');
@@ -33,14 +34,28 @@ function logout(){
 
 function register(){
     event.preventDefault();
-    let data = new FormData(event.target);
+    let data = Object.fromEntries(new FormData(event.target).entries());
+
+    //Validaciones
+    if(data.password.length < 8){
+        alert("Contrasena no puede se menor a 8 caracteres");
+        return;
+    }
+    if(data.password != data.confirm_password){
+        alert("Contrasenas no son iguales");
+        return;
+    }
+    if(new Date(data.birthday) > new Date()){
+        alert("La fecha de nacimiento no puede ser futura")
+        return;
+    }
 
     fetch('/users', {
         method: 'POST',
         headers: {
             'Content-Type':'application/json'
         },
-        body: JSON.stringify(Object.fromEntries(data.entries()))
+        body: JSON.stringify(data)
     })
     .then(response => {
         if(!response.ok){
@@ -54,6 +69,7 @@ function register(){
     })
     .catch(err => {
         console.error("Error en Registro:", err);
+        alert("Error creando cuenta: " + err.message);
     })
 }
 let formRegister = document.getElementById('formRegister');
@@ -63,7 +79,6 @@ function populateModal(){
     let user = JSON.parse(sessionStorage.user);
     document.getElementById('inputUsername').value = user.name;
     document.getElementById('inputBio').value = user.bio || '';
-    document.getElementById('inputPassword').value = user.password;
     document.getElementById('inputBirthdate').value = user.birthday.slice(0, 10);
 }
 let modalEdit = document.getElementById('modalEditarPerfil');
@@ -105,7 +120,8 @@ if(button_confirm_user){
 function patchUser(){
     event.preventDefault();
     let user = JSON.parse(sessionStorage.user);
-    let data = new FormData(event.target);
+    let data = Object.fromEntries(new FormData(event.target).entries());
+    if(!data.password) delete data.password; //Si viene vacia la conrtasena no la cambies
 
     fetch('/users/'+user.id, {
         method: 'PATCH',
@@ -113,7 +129,7 @@ function patchUser(){
             'x-auth': user.password,
             'Content-Type':'application/json'
         },
-        body: JSON.stringify(Object.fromEntries(data.entries()))
+        body: JSON.stringify(data)
     })
     .then(response => {
         if(!response.ok){
@@ -123,9 +139,9 @@ function patchUser(){
     })
     .then(response => {
         sessionStorage.setItem('user', JSON.stringify(response.user));
-        alert("Cambios Realizados")
+        bootstrap.Modal.getInstance(modalEdit).hide();
         init()
-        window.location.href = local_url + 'views/index.html';
+        alert("Cambios realizados")
     })
     .catch(err => {
         console.error("Error en la edicion:", err);
@@ -141,11 +157,17 @@ function init(){
     const user = JSON.parse(sessionStorage.user);
 
     if(page === "profile.html"){
-        document.getElementById('user_name').innerHTML = user.name;
+        document.getElementById('user_name').textContent = user.name;
         document.getElementById('user_joined_at').innerHTML = 
             new Date(user.joined_at).toLocaleDateString('es-MX', {month: 'short', year: 'numeric'});
         document.getElementById('user_birthday').innerHTML = 
-            new Date(user.birthday).toLocaleDateString('es-MX', {day:'numeric', month: 'short', year: 'numeric'});
+            new Date(user.birthday).toLocaleDateString('es-MX', {day:'numeric', month: 'short', year: 'numeric', timeZone:'UTC'});
+    }
+
+    if(page === "index.html"){
+        document.getElementById('hero_welcome_message').classList.remove('d-none');
+        document.getElementById('hero_login').classList.add('d-none');
+        document.getElementById('hero_register').classList.add('d-none');
     }
 }
 document.addEventListener('DOMContentLoaded', init);

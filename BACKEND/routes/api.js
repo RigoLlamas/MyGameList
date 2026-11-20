@@ -8,12 +8,7 @@ routerApi.use('/users', routerUsers);
 
 
 routerApi.get('/', (req,res) => {
-    if(req.header("x-auth")){
-        res.sendFile(path.resolve(__dirname+"/../../FRONTEND/views/index.html"));
-    }
-    else{
-        res.sendFile(path.resolve(__dirname+"/../../FRONTEND/views/login.html"));
-    }
+    res.redirect('/views/index.html');
 });
 routerApi.get('/home.html', (req,res) => {
     res.sendFile(path.resolve(__dirname+"/../../FRONTEND/views/index.html"));
