@@ -35,7 +35,9 @@ function login(){
     })
     .catch(err => {
         console.error("Error en Login:", err);
-        alert("Error inciando sesion: " + err.message);
+        hideLoading(()=>{
+            alert("Error inciando sesion: " + err.message);
+        })
     })
 }
 let formLogin = document.getElementById('formLogin');
@@ -85,7 +87,9 @@ function register(){
     })
     .catch(err => {
         console.error("Error en Registro:", err);
-        alert("Error creando cuenta: " + err.message);
+        hideLoading(()=>{
+            alert("Error creando cuenta: " + err.message);
+        })
     })
 }
 let formRegister = document.getElementById('formRegister');
