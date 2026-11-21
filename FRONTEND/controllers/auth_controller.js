@@ -1,7 +1,19 @@
+//Funciones para mostrar y ocultar lottie//
+function showLoading(){
+    document.getElementById('loading_overlay').style.display = 'flex';
+}
+function hideLoading(despues){
+    setTimeout(() => {
+        document.getElementById('loading_overlay').style.display = 'none'
+        if(despues) despues();
+    }, 2000);
+}
+////////////////////////////////////////////
 function login(){
     event.preventDefault();
     let data = new FormData(event.target);
 
+    showLoading();
     fetch('/login', {
         method: 'POST',
         headers: {
@@ -17,11 +29,15 @@ function login(){
     })
     .then(user => {
         sessionStorage.setItem('user', JSON.stringify(user));
-        window.location.href = local_url + 'views/index.html';
+        hideLoading(()=>{
+            window.location.href = local_url + 'views/index.html';
+        })
     })
     .catch(err => {
         console.error("Error en Login:", err);
-        alert("Error inciando sesion: " + err.message);
+        hideLoading(()=>{
+            alert("Error inciando sesion: " + err.message);
+        })
     })
 }
 let formLogin = document.getElementById('formLogin');
@@ -41,7 +57,7 @@ function register(){
         alert("Contrasena no puede se menor a 8 caracteres");
         return;
     }
-    if(data.password != data.confirm_password){
+    if(data.password !== data.confirm_password){
         alert("Contrasenas no son iguales");
         return;
     }
@@ -49,7 +65,7 @@ function register(){
         alert("La fecha de nacimiento no puede ser futura")
         return;
     }
-
+    showLoading();
     fetch('/users', {
         method: 'POST',
         headers: {
@@ -65,11 +81,15 @@ function register(){
     })
     .then(user => {
         sessionStorage.setItem('user', JSON.stringify(user));
-        window.location.href = local_url + 'views/index.html';
+        hideLoading(()=>{
+            window.location.href = local_url + 'views/index.html';
+        })
     })
     .catch(err => {
         console.error("Error en Registro:", err);
-        alert("Error creando cuenta: " + err.message);
+        hideLoading(()=>{
+            alert("Error creando cuenta: " + err.message);
+        })
     })
 }
 let formRegister = document.getElementById('formRegister');
