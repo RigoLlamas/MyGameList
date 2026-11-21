@@ -1,22 +1,66 @@
 const express = require('express');
-const path = require('path');
+const mongoose = require('mongoose');
 const routerApi = express.Router();
-const routerUsers = require('./users.js');
-const usersController = require('../controllers/users_api_controller.js')
 
+const routerGames = require('./games');
+const routerSteam = require('./steam');
+const routerUsers = require('./users');
+const Game = require('../models/game');
+
+routerApi.get('/test-db', async (req, res) => {
+    try {
+        const state = mongoose.connection.readyState;
+        const estados = {
+            0: 'Desconectado',
+            1: 'Conectado',
+            2: 'Conectando',
+            3: 'Desconectando'
+        };
+
+        const isConnected = (state === 1);
+        let detalles = {
+            estado: estados[state] || 'Desconocido',
+            codigoEstado: state,
+            conectado: isConnected
+        };
+
+        if (isConnected) {
+            const adminDb = mongoose.connection.db.admin();
+            const pingResult = await adminDb.ping();
+            const totalJuegos = await Game.countDocuments();
+
+            detalles = {
+                ...detalles,
+                baseDeDatos: mongoose.connection.name,
+                host: mongoose.connection.host,
+                puerto: mongoose.connection.port,
+                pingOk: (pingResult.ok === 1),
+                colecciones: {
+                    juegosRegistrados: totalJuegos
+                }
+            };
+        }
+
+        res.status(isConnected ? 200 : 503).json({
+            ok: isConnected,
+            mensaje: isConnected 
+                ? 'Conexión a MongoDB Atlas verificada y funcional.' 
+                : 'No hay conexión activa con MongoDB Atlas.',
+            detalles,
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        res.status(500).json({
+            ok: false,
+            mensaje: 'Error al consultar el estado de la base de datos',
+            error: error.message
+        });
+    }
+});
+
+// Enrutadores funcionales
+routerApi.use('/games', routerGames);
+routerApi.use('/steam', routerSteam);
 routerApi.use('/users', routerUsers);
-
-
-routerApi.get('/', (req,res) => {
-    res.redirect('/views/index.html');
-});
-routerApi.get('/home.html', (req,res) => {
-    res.sendFile(path.resolve(__dirname+"/../../FRONTEND/views/index.html"));
-});
-routerApi.get('/login.html', (req, res) => {
-    res.sendFile(path.resolve(__dirname+"/../../FRONTEND/views/login.html"));
-});
-routerApi.post('/login', usersController.login)
-
 
 module.exports = routerApi;
