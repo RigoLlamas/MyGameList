@@ -6,7 +6,7 @@ function hideLoading(despues){
     setTimeout(() => {
         document.getElementById('loading_overlay').style.display = 'none'
         if(despues) despues();
-    }, 7000);
+    }, 2000);
 }
 ////////////////////////////////////////////
 function login(){
