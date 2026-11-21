@@ -5,6 +5,8 @@ const routerApi = express.Router();
 const routerGames = require('./games');
 const routerSteam = require('./steam');
 const routerUsers = require('./users');
+const routerGenres = require('./genres');
+const routerPlatforms = require('./platforms');
 const Game = require('../models/game');
 
 routerApi.get('/test-db', async (req, res) => {
@@ -62,5 +64,7 @@ routerApi.get('/test-db', async (req, res) => {
 routerApi.use('/games', routerGames);
 routerApi.use('/steam', routerSteam);
 routerApi.use('/users', routerUsers);
+routerApi.use('/genres', routerGenres);
+routerApi.use('/platforms', routerPlatforms);
 
 module.exports = routerApi;
