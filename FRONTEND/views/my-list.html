@@ -23,6 +23,8 @@
         <script src="../controllers/auth_controller.js" defer></script>
         <!--JS de la barra de navegacion-->
         <script src="../assets/js/navbar.js" defer></script>
+        <!--Lottie-->
+        <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     </head>
 
     <body class="bg-light">
@@ -216,5 +218,10 @@
             integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
             crossorigin="anonymous"
         ></script>
+        <!-- Loading -->
+        <div id="loading_overlay">
+            <lottie-player src="../assets/lottie/loading.json" background="transparent" speed="1"
+                style="width: 200px; height: 200px;" loop autoplay id="load_gif"></lottie-player>
+        </div>
     </body>
 </html>

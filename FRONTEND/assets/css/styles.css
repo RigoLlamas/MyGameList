@@ -136,3 +136,15 @@
 .stat-card:last-child {
   border-right: none;
 }
+/* ------------------------------------------
+   7. Loading de Lottie
+   ------------------------------------------ */
+#loading_overlay {
+    position: fixed;
+    inset: 0;                          /* toda la pantalla */
+    background: rgba(15, 23, 42, 0.6); /* fondo oscuro semitransparente */
+    display: none;                     /* oculto por defecto */
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;                     /* encima de navbar y modales */
+}
