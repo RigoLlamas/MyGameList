@@ -1,7 +1,11 @@
+// BACKEND/routes/auth.js
 const express = require('express');
 const routerAuth = express.Router();
-const usersController = require('../controllers/users_api_controller.js');
+const authController = require('../controllers/auth_api_controller');
 
-routerAuth.post('/login', usersController.login);
+// Rutas de autenticación
+routerAuth.post('/login', authController.login);
+routerAuth.post('/logout', authController.logout);
+routerAuth.get('/me', authController.getMe);
 
 module.exports = routerAuth;

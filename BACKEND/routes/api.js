@@ -7,6 +7,7 @@ const routerSteam = require('./steam');
 const routerUsers = require('./users');
 const routerGenres = require('./genres');
 const routerPlatforms = require('./platforms');
+const routerMylist = require('./mylist');
 const routerAuth = require('./auth');
 const Game = require('../models/game');
 
@@ -67,6 +68,7 @@ routerApi.use('/steam', routerSteam);
 routerApi.use('/users', routerUsers);
 routerApi.use('/genres', routerGenres);
 routerApi.use('/platforms', routerPlatforms);
+routerApi.use('/mylist', routerMylist);
 routerApi.use('/auth', routerAuth);
 
 module.exports = routerApi;

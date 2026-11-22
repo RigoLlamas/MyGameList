@@ -9,5 +9,16 @@
     "friends": [],
     "favorites": [],
     "bio": ""
+  },
+  {
+    "id": 2,
+    "name": "Diego Uribe",
+    "email": "test1@correo.com",
+    "password": "pass12345678",
+    "birthday": "2026-11-02T06:00:00.000Z",
+    "joined_at": "2026-11-22T04:03:10.431Z",
+    "friends": [],
+    "favorites": [],
+    "bio": ""
   }
 ]
