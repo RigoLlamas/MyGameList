@@ -161,41 +161,80 @@
             </div>
         </main>
 
-        <!--Modal Editar Detalles-->
-        <div class="modal" id="edit_details">
-            <div class="modal-dialog">
-                <div class="modal-content">
+        <!-- Modal Editar Detalles y Progreso -->
+        <div class="modal fade" id="edit_details" tabindex="-1" aria-labelledby="editDetailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow rounded-4">
                     
-                    <!--Modal Header-->
-                    <div class="modal-header">
-                        <h4 class="modal-title">Editar Detalles de Juego</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <!-- Modal Header -->
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <div>
+                            <h5 class="modal-title fw-bold" id="editDetailsModalLabel">
+                                <i class="bi bi-controller me-2 text-primary"></i>Actualizar Progreso
+                            </h5>
+                            <p class="text-secondary small mb-0" id="modalGameTitle">Configura tu tiempo y avance del juego</p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
 
-                    <!--Modal Body-->
-                    <div class="modal-body">
-                        <form>
-                            <!--Horas-->
+                    <!-- Modal Body -->
+                    <div class="modal-body pt-3">
+                        <form id="formEditProgress">
+                            <!-- Estado de la partida -->
+                            <div class="mb-3">
+                                <label for="edit_status" class="form-label fw-semibold small">Estado:</label>
+                                <select id="edit_status" name="status" class="form-select rounded-3">
+                                    <option value="playing" selected>Jugando</option>
+                                    <option value="completed">Completado</option>
+                                    <option value="planned">Planeado</option>
+                                    <option value="dropped">Abandonado</option>
+                                </select>
+                            </div>
+
+                            <!-- Horas -->
                             <div class="mb-3">
                                 <label for="edit_hours" class="form-label fw-semibold small">Horas Jugadas:</label>
                                 <div class="input-group">
-                                    <input id="edit_hours" class="form-control" type="number" name="hours" min="0" step="1" value="0" required="true"><br>
+                                    <span class="input-group-text bg-light text-secondary"><i class="bi bi-clock-history"></i></span>
+                                    <input id="edit_hours" class="form-control rounded-end-3" type="number" name="hours" min="0" step="1" value="0" required placeholder="Ej. 15">
                                 </div>
                             </div>
-                            <!--Progreso-->
+
+                            <!-- Progreso Slider -->
                             <div class="mb-3">
-                                <label for="edit_progress" class="form-label fw-semibold small">Progreso: <span id="edit_progress_value">0</span>%</label>
-                                <div class="input-group">
-                                    <input id="edit_progress" class="form-range slider" type="range" name="progress" min="0" max="100" value="0" required="true"><br>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label for="edit_progress" class="form-label fw-semibold small mb-0">Progreso:</label>
+                                    <span class="badge bg-primary-subtle text-primary fw-bold fs-6 px-3 py-1 rounded-pill">
+                                        <span id="edit_progress_value">0</span>%
+                                    </span>
                                 </div>
+                                <input id="edit_progress" class="form-range" type="range" name="progress" min="0" max="100" value="0">
+                            </div>
+
+                            <!-- Calificación / Puntuación opcional -->
+                            <div class="mb-2">
+                                <label for="edit_score" class="form-label fw-semibold small">Calificación Personal (1-10):</label>
+                                <select id="edit_score" name="score" class="form-select rounded-3">
+                                    <option value="">Sin calificar</option>
+                                    <option value="10">(10) Obra Maestra</option>
+                                    <option value="9">(9) Excelente</option>
+                                    <option value="8">(8) Muy Bueno</option>
+                                    <option value="7">(7) Bueno</option>
+                                    <option value="6">(6) Decente</option>
+                                    <option value="5">(5) Regular</option>
+                                    <option value="4">(4) Malo</option>
+                                    <option value="3">(3) Muy Malo</option>
+                                    <option value="2">(2) Pésimo</option>
+                                    <option value="1">(1) Injugable</option>
+                                </select>
                             </div>
                         </form>
                     </div>
 
                     <!-- Modal footer -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-success"  id="btnSaveGame">Guardar</button>
+                    <div class="modal-footer border-top-0 pt-0">
+                        <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary rounded-pill px-4" id="btnSaveGame">Guardar Cambios</button>
                     </div>
                 </div>
             </div>
