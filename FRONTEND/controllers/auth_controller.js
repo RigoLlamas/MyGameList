@@ -14,7 +14,7 @@ function login(){
     let data = new FormData(event.target);
 
     showLoading();
-    fetch('/login', {
+    fetch('/api/auth/login', {
         method: 'POST',
         headers: {
             'Content-Type':'application/json'
@@ -66,7 +66,7 @@ function register(){
         return;
     }
     showLoading();
-    fetch('/users', {
+    fetch('/api/users', {
         method: 'POST',
         headers: {
             'Content-Type':'application/json'
@@ -115,7 +115,7 @@ function deleteUser(){
     event.preventDefault();
     let user = JSON.parse(sessionStorage.user);
 
-    fetch('/users/'+user.id, {
+    fetch('/api/users/'+user.id, {
         method: 'DELETE',
         headers: { 'x-auth': user.password }
     })
@@ -143,7 +143,7 @@ function patchUser(){
     let data = Object.fromEntries(new FormData(event.target).entries());
     if(!data.password) delete data.password; //Si viene vacia la conrtasena no la cambies
 
-    fetch('/users/'+user.id, {
+    fetch('/api/users/'+user.id, {
         method: 'PATCH',
         headers: {
             'x-auth': user.password,

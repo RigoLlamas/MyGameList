@@ -7,6 +7,7 @@ const routerSteam = require('./steam');
 const routerUsers = require('./users');
 const routerGenres = require('./genres');
 const routerPlatforms = require('./platforms');
+const routerAuth = require('./auth');
 const Game = require('../models/game');
 
 routerApi.get('/test-db', async (req, res) => {
@@ -66,5 +67,6 @@ routerApi.use('/steam', routerSteam);
 routerApi.use('/users', routerUsers);
 routerApi.use('/genres', routerGenres);
 routerApi.use('/platforms', routerPlatforms);
+routerApi.use('/auth', routerAuth);
 
 module.exports = routerApi;
