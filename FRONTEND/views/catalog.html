@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="../assets/css/styles.css">
   <!--JS de authenticacion de usuarios-->
   <script src="../controllers/env.js" defer></script>
+  <script src="../controllers/catalog_controller.js" defer></script>
   <script src="../controllers/auth_controller.js" defer></script>
   <!--JS de la barra de navegacion-->
   <script src="../assets/js/navbar.js" defer></script>
@@ -44,36 +45,37 @@
         <div class="col-md-4">
           <div class="input-group">
             <span class="input-group-text bg-white border-end-0 text-secondary"><i class="bi bi-search"></i></span>
-            <input type="text" class="form-control border-start-0" placeholder="Buscar por título...">
+            <input id="catalog_search" type="text" class="form-control border-start-0" placeholder="Buscar por título...">
           </div>
         </div>
         <!-- Filtro por Género -->
         <div class="col-6 col-md-3">
-          <select class="form-select">
-            <option selected>Todos los géneros</option>
+          <select id="catalog_genre" class="form-select">
+            <option value="" selected>Todos los géneros</option>
             <option value="aventura">Aventura</option>
-            <option value="accion">Acción</option>
-            <option value="rpg">RPG</option>
-            <option value="mundo_abierto">Mundo Abierto</option>
-            <option value="roguelike">Roguelike</option>
+            <option value="Acción">Acción</option>
+            <option value="Rol">Rol</option>
+            <option value="Indie">Indie</option>
+            <option value="Estrategia">Estrategia</option>
+            <option value="Deportes">Deportes</option>
+            <option value="Free to Play">Free to Play</option>
           </select>
         </div>
         <!-- Filtro por Plataforma -->
         <div class="col-6 col-md-3">
-          <select class="form-select">
-            <option selected>Todas las plataformas</option>
-            <option value="switch">Nintendo Switch</option>
-            <option value="pc">PC</option>
-            <option value="ps5">PlayStation 5</option>
-            <option value="xbox">Xbox Series X</option>
+          <select id="catalog_platform" class="form-select">
+            <option value="" selected>Todas las plataformas</option>
+            <option value="PC">PC</option>
+            <option value="Linux">Linux</option>
+            <option value="Mac">Mac</option>
           </select>
         </div>
         <!-- Ordenamiento -->
         <div class="col-12 col-md-2">
-          <select class="form-select">
+          <select id="catalog_sort" class="form-select">
             <option value="popularidad" selected>Más populares</option>
             <option value="nombre">Nombre (A-Z)</option>
-            <option value="ano">Año de salida</option>
+            <option value="anio">Año de salida</option>
             <option value="horas">Promedio de horas</option>
           </select>
         </div>
@@ -81,159 +83,12 @@
     </div>
 
     <!-- Grilla de Juegos (Hardcoded) -->
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 mb-5">
-      
-      <!-- Juego 1 -->
-      <div class="col">
-        <div class="card h-100 border-0 shadow-sm rounded-3">
-          <div class="img-placeholder text-secondary rounded-top-3">
-            <i class="bi bi-image fs-1 opacity-50"></i>
-          </div>
-          <div class="card-body d-flex flex-column p-3">
-            <h6 class="card-title fw-bold text-dark mb-1">The Legend of Zelda: Breath of the Wild</h6>
-            <p class="text-secondary small mb-2">2017 &nbsp;|&nbsp; Aventura</p>
-            <div class="d-flex gap-1 mb-3">
-              <span class="badge badge-switch px-2 py-1 rounded-pill small">Switch</span>
-            </div>
-            <a href="game-detail.html" class="btn btn-outline-primary btn-sm mt-auto w-100">Ver Detalle</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Juego 2 -->
-      <div class="col">
-        <div class="card h-100 border-0 shadow-sm rounded-3">
-          <div class="img-placeholder text-secondary rounded-top-3">
-            <i class="bi bi-image fs-1 opacity-50"></i>
-          </div>
-          <div class="card-body d-flex flex-column p-3">
-            <h6 class="card-title fw-bold text-dark mb-1">Elden Ring</h6>
-            <p class="text-secondary small mb-2">2022 &nbsp;|&nbsp; Action RPG</p>
-            <div class="d-flex gap-1 mb-3 flex-wrap">
-              <span class="badge badge-pc px-2 py-1 rounded-pill small">PC</span>
-              <span class="badge badge-ps5 px-2 py-1 rounded-pill small">PS5</span>
-              <span class="badge badge-xbox px-2 py-1 rounded-pill small">Xbox</span>
-            </div>
-            <a href="game-detail.html" class="btn btn-outline-primary btn-sm mt-auto w-100">Ver Detalle</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Juego 3 -->
-      <div class="col">
-        <div class="card h-100 border-0 shadow-sm rounded-3">
-          <div class="img-placeholder text-secondary rounded-top-3">
-            <i class="bi bi-image fs-1 opacity-50"></i>
-          </div>
-          <div class="card-body d-flex flex-column p-3">
-            <h6 class="card-title fw-bold text-dark mb-1">Baldur's Gate 3</h6>
-            <p class="text-secondary small mb-2">2023 &nbsp;|&nbsp; RPG</p>
-            <div class="d-flex gap-1 mb-3 flex-wrap">
-              <span class="badge badge-pc px-2 py-1 rounded-pill small">PC</span>
-              <span class="badge badge-ps5 px-2 py-1 rounded-pill small">PS5</span>
-            </div>
-            <a href="game-detail.html" class="btn btn-outline-primary btn-sm mt-auto w-100">Ver Detalle</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Juego 4 -->
-      <div class="col">
-        <div class="card h-100 border-0 shadow-sm rounded-3">
-          <div class="img-placeholder text-secondary rounded-top-3">
-            <i class="bi bi-image fs-1 opacity-50"></i>
-          </div>
-          <div class="card-body d-flex flex-column p-3">
-            <h6 class="card-title fw-bold text-dark mb-1">Persona 5 Royal</h6>
-            <p class="text-secondary small mb-2">2019 &nbsp;|&nbsp; JRPG</p>
-            <div class="d-flex gap-1 mb-3 flex-wrap">
-              <span class="badge badge-ps5 px-2 py-1 rounded-pill small">PS5</span>
-              <span class="badge badge-switch px-2 py-1 rounded-pill small">Switch</span>
-              <span class="badge badge-pc px-2 py-1 rounded-pill small">PC</span>
-            </div>
-            <a href="game-detail.html" class="btn btn-outline-primary btn-sm mt-auto w-100">Ver Detalle</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Juego 5 -->
-      <div class="col">
-        <div class="card h-100 border-0 shadow-sm rounded-3">
-          <div class="img-placeholder text-secondary rounded-top-3">
-            <i class="bi bi-image fs-1 opacity-50"></i>
-          </div>
-          <div class="card-body d-flex flex-column p-3">
-            <h6 class="card-title fw-bold text-dark mb-1">Hades</h6>
-            <p class="text-secondary small mb-2">2020 &nbsp;|&nbsp; Roguelike</p>
-            <div class="d-flex gap-1 mb-3 flex-wrap">
-              <span class="badge badge-switch px-2 py-1 rounded-pill small">Switch</span>
-              <span class="badge badge-pc px-2 py-1 rounded-pill small">PC</span>
-            </div>
-            <a href="game-detail.html" class="btn btn-outline-primary btn-sm mt-auto w-100">Ver Detalle</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Juego 6 -->
-      <div class="col">
-        <div class="card h-100 border-0 shadow-sm rounded-3">
-          <div class="img-placeholder text-secondary rounded-top-3">
-            <i class="bi bi-image fs-1 opacity-50"></i>
-          </div>
-          <div class="card-body d-flex flex-column p-3">
-            <h6 class="card-title fw-bold text-dark mb-1">Stardew Valley</h6>
-            <p class="text-secondary small mb-2">2016 &nbsp;|&nbsp; Simulación</p>
-            <div class="d-flex gap-1 mb-3 flex-wrap">
-              <span class="badge badge-pc px-2 py-1 rounded-pill small">PC</span>
-              <span class="badge badge-switch px-2 py-1 rounded-pill small">Switch</span>
-            </div>
-            <a href="game-detail.html" class="btn btn-outline-primary btn-sm mt-auto w-100">Ver Detalle</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Juego 7 -->
-      <div class="col">
-        <div class="card h-100 border-0 shadow-sm rounded-3">
-          <div class="img-placeholder text-secondary rounded-top-3">
-            <i class="bi bi-image fs-1 opacity-50"></i>
-          </div>
-          <div class="card-body d-flex flex-column p-3">
-            <h6 class="card-title fw-bold text-dark mb-1">Cyberpunk 2077</h6>
-            <p class="text-secondary small mb-2">2020 &nbsp;|&nbsp; Mundo Abierto</p>
-            <div class="d-flex gap-1 mb-3 flex-wrap">
-              <span class="badge badge-pc px-2 py-1 rounded-pill small">PC</span>
-              <span class="badge badge-ps5 px-2 py-1 rounded-pill small">PS5</span>
-              <span class="badge badge-xbox px-2 py-1 rounded-pill small">Xbox</span>
-            </div>
-            <a href="game-detail.html" class="btn btn-outline-primary btn-sm mt-auto w-100">Ver Detalle</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Juego 8 -->
-      <div class="col">
-        <div class="card h-100 border-0 shadow-sm rounded-3">
-          <div class="img-placeholder text-secondary rounded-top-3">
-            <i class="bi bi-image fs-1 opacity-50"></i>
-          </div>
-          <div class="card-body d-flex flex-column p-3">
-            <h6 class="card-title fw-bold text-dark mb-1">Hollow Knight</h6>
-            <p class="text-secondary small mb-2">2017 &nbsp;|&nbsp; Metroidvania</p>
-            <div class="d-flex gap-1 mb-3 flex-wrap">
-              <span class="badge badge-pc px-2 py-1 rounded-pill small">PC</span>
-              <span class="badge badge-switch px-2 py-1 rounded-pill small">Switch</span>
-            </div>
-            <a href="game-detail.html" class="btn btn-outline-primary btn-sm mt-auto w-100">Ver Detalle</a>
-          </div>
-        </div>
-      </div>
-
+    <div id="catalog_grid" class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 mb-5">
     </div>
 
     <!-- Componente de Paginación -->
     <nav aria-label="Navegación del catálogo">
-      <ul class="pagination justify-content-center">
+      <ul id="catalog_pagination" class="pagination justify-content-center">
         <li class="page-item disabled">
           <a class="page-link" href="#" tabindex="-1">Anterior</a>
         </li>
