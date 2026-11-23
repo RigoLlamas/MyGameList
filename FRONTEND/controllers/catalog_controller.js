@@ -4,6 +4,7 @@ const catalogSearch = document.getElementById('catalog_search');
 const catalogGenre = document.getElementById('catalog_genre');
 const catalogPlatform = document.getElementById('catalog_platform');
 const catalogSort = document.getElementById('catalog_sort');
+const catalogPagination = document.getElementById('catalog_pagination');
 
 let pagina_actual = 1;
 
@@ -39,6 +40,33 @@ function crearTarjeta(juego) {
         </div>`;
 }
 
+// Dibuja los botones de paginación según lo que respondió el backend
+function renderPaginacion(paginaActual, totalPaginas) {
+    if (totalPaginas <= 1) {
+        catalogPagination.innerHTML = '';        // con una sola página no hace falta
+        return;
+    }
+
+    let html = `
+        <li class="page-item ${paginaActual === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" data-page="${paginaActual - 1}">Anterior</a>
+        </li>`;
+
+    for (let i = 1; i <= totalPaginas; i++) {
+        html += `
+            <li class="page-item ${i === paginaActual ? 'active' : ''}">
+                <a class="page-link" href="#" data-page="${i}">${i}</a>
+            </li>`;
+    }
+
+    html += `
+        <li class="page-item ${paginaActual === totalPaginas ? 'disabled' : ''}">
+            <a class="page-link" href="#" data-page="${paginaActual + 1}">Siguiente</a>
+        </li>`;
+
+    catalogPagination.innerHTML = html;
+}
+
 // Pide los juegos al backend y los pinta en la grilla
 async function cargarCatalogo() {
     showLoading();
@@ -60,10 +88,13 @@ async function cargarCatalogo() {
 
         if (result.juegos.length === 0) {
             catalogGrid.innerHTML = `<p class="text-secondary text-center w-100">No se encontraron juegos.</p>`;
+            catalogPagination.innerHTML = '';
             return;
         }
 
         catalogGrid.innerHTML = result.juegos.map(crearTarjeta).join('');
+        catalogGrid.innerHTML = result.juegos.map(crearTarjeta).join('');
+        renderPaginacion(result.paginaActual, result.totalPaginas);
     } catch (err) {
         console.error('Error en catálogo:', err);
         alert('No se pudo cargar el catálogo: ' + err.message);
@@ -90,5 +121,21 @@ if(catalogSearch){
 [catalogGenre, catalogPlatform, catalogSort].forEach(select => {
     if(select) select.addEventListener('change', aplicarFiltros);
 });
+
+// Paginación: un solo listener para todos los botones
+if (catalogPagination) {
+    catalogPagination.addEventListener('click', (event) => {
+        const link = event.target.closest('a[data-page]');
+        if (!link) return;
+
+        event.preventDefault();                            // que el href="#" no salte arriba ni cambie la URL
+        const item = link.parentElement;
+        if (item.classList.contains('disabled') || item.classList.contains('active')) return;
+
+        pagina_actual = Number(link.dataset.page);
+        cargarCatalogo();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+}
 
 if (catalogGrid) cargarCatalogo();
