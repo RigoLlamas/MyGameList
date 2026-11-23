@@ -4,6 +4,53 @@ const UserGame = require('../models/user_game');
 const Game = require('../models/game');
 const { asegurarGenerosYPlataformas } = require('./games_api_controller');
 
+// Helper para recalcular promedioHoras y numeroFavoritos en el catálogo (Game)
+async function sincronizarMetricasJuego(item) {
+  try {
+    if (!item) return;
+
+    let juego = null;
+    if (item.juegoId && mongoose.Types.ObjectId.isValid(item.juegoId)) {
+      juego = await Game.findById(item.juegoId);
+    }
+    if (!juego && item.steamAppId) {
+      juego = await Game.findOne({ steamAppId: Number(item.steamAppId) });
+    }
+    if (!juego && item.titulo) {
+      const tituloEscapado = item.titulo.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      juego = await Game.findOne({ titulo: { $regex: `^${tituloEscapado}$`, $options: 'i' } });
+    }
+    if (!juego) return;
+
+    const condiciones = [{ juegoId: juego._id }];
+    if (juego.steamAppId) {
+      condiciones.push({ steamAppId: juego.steamAppId });
+    }
+    if (juego.titulo) {
+      const tituloEscapado = juego.titulo.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      condiciones.push({ titulo: { $regex: `^${tituloEscapado}$`, $options: 'i' } });
+    }
+
+    const registros = await UserGame.find({ $or: condiciones });
+
+    // Promedio de horas entre los usuarios que han registrado tiempo (> 0 h)
+    const conHoras = registros.filter((r) => Number(r.horasJugadas) > 0);
+    const sumaHoras = conHoras.reduce((acc, r) => acc + Number(r.horasJugadas), 0);
+    const promedioHoras = conHoras.length > 0
+      ? Math.round((sumaHoras / conHoras.length) * 10) / 10
+      : 0;
+
+    const numeroFavoritos = registros.filter((r) => Boolean(r.esFavorito)).length;
+
+    await Game.findByIdAndUpdate(juego._id, {
+      promedioHoras,
+      numeroFavoritos
+    });
+  } catch (error) {
+    console.error('Error al sincronizar métricas del juego:', error.message);
+  }
+}
+
 // GET /api/mylist - Obtener la lista de juegos de un usuario (filtro opcional por estado y favorito)
 const getMyList = async (req, res) => {
   try {
@@ -149,6 +196,7 @@ const addGameToMyList = async (req, res) => {
 
     await nuevoItem.save();
     await asegurarGenerosYPlataformas([], [nuevoItem.plataforma]);
+    await sincronizarMetricasJuego(nuevoItem);
 
     res.status(201).json({
       ok: true,
@@ -214,6 +262,8 @@ const updateMyListGame = async (req, res) => {
       return res.status(404).json({ ok: false, mensaje: 'Juego no encontrado en la lista.' });
     }
 
+    await sincronizarMetricasJuego(itemActualizado);
+
     res.json({
       ok: true,
       mensaje: 'Progreso actualizado exitosamente.',
@@ -244,6 +294,7 @@ const toggleFavorite = async (req, res) => {
 
     item.esFavorito = !item.esFavorito;
     await item.save();
+    await sincronizarMetricasJuego(item);
 
     res.json({
       ok: true,
@@ -274,6 +325,8 @@ const deleteGameFromMyList = async (req, res) => {
     if (!itemEliminado) {
       return res.status(404).json({ ok: false, mensaje: 'Juego no encontrado en la lista.' });
     }
+
+    await sincronizarMetricasJuego(itemEliminado);
 
     res.json({
       ok: true,
