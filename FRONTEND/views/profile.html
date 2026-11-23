@@ -18,6 +18,8 @@
     <!--JS de la autenticacion de usuario-->
     <script src="../controllers/env.js" defer></script>
     <script src="../controllers/auth_controller.js" defer></script>
+    <!--JS de amigos-->
+    <script src="../controllers/friends_controller.js" defer></script>
     <!--JS de la barra de navegacion-->
     <script src="../assets/js/navbar.js" defer></script>
     <!--Lottie-->
@@ -167,178 +169,15 @@
             </div>
         </div>
 
-        <!-- Sección de Amigos y Búsqueda -->
+        <!-- Sección de Amigos (la búsqueda de personas está en la navbar) -->
         <div class="card border-0 shadow-sm rounded-4 p-4">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-                <div>
-                    <h3 class="fw-bold m-0 fs-4">Amigos <span class="badge text-bg-secondary ms-1">4</span></h3>
-                    <p class="text-secondary small mb-0">Encuentra usuarios y conecta con otros jugadores</p>
-                </div>
-
-                <!-- Searchbar para buscar personas -->
-                <div class="col-12 col-md-5 col-lg-4">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0 rounded-start-pill text-secondary ps-3">
-                            <i class="bi bi-search"></i>
-                        </span>
-                        <input type="text" class="form-control border-start-0 rounded-end-pill ps-0"
-                            placeholder="Buscar personas..." aria-label="Buscar personas" />
-                    </div>
-                </div>
+            <div class="mb-4">
+                <h3 class="fw-bold m-0 fs-4">Amigos <span id="friends_count" class="badge text-bg-secondary ms-1">0</span></h3>
+                <p class="text-secondary small mb-0">Encuentra jugadores con la barra <strong>Buscar personas</strong> de arriba</p>
             </div>
 
-            <!-- Lista de Amigos -->
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
-                <!-- Amigo 1 -->
-                <div class="col">
-                    <div class="card border rounded-3 p-3 h-100 shadow-sm">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center flex-shrink-0"
-                                style="width: 48px; height: 48px;">
-                                <i class="bi bi-person-fill fs-4"></i>
-                            </div>
-                            <div class="flex-grow-1 text-truncate">
-                                <h6 class="fw-bold mb-0 text-truncate">AlexGamer</h6>
-                                <span class="badge bg-success-subtle text-success rounded-pill small">En línea</span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn btn-light btn-sm rounded-circle p-1" type="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                    <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Ver
-                                            perfil</a></li>
-                                    <li><a class="dropdown-item" href="#"><i
-                                                class="bi bi-chat-dots me-2"></i>Mensaje</a></li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li><a class="dropdown-item text-danger" href="#"><i
-                                                class="bi bi-person-x me-2"></i>Eliminar amigo</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="mt-3 pt-2 border-top d-flex justify-content-between text-secondary small">
-                            <span><i class="bi bi-controller me-1"></i>42 juegos</span>
-                            <span><i class="bi bi-trophy me-1"></i>18 comp.</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Amigo 2 -->
-                <div class="col">
-                    <div class="card border rounded-3 p-3 h-100 shadow-sm">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="rounded-circle bg-danger-subtle text-danger d-flex align-items-center justify-content-center flex-shrink-0"
-                                style="width: 48px; height: 48px;">
-                                <i class="bi bi-person-fill fs-4"></i>
-                            </div>
-                            <div class="flex-grow-1 text-truncate">
-                                <h6 class="fw-bold mb-0 text-truncate">Sarah_Pixel</h6>
-                                <span class="badge bg-secondary-subtle text-secondary rounded-pill small">Ausente</span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn btn-light btn-sm rounded-circle p-1" type="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                    <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Ver
-                                            perfil</a></li>
-                                    <li><a class="dropdown-item" href="#"><i
-                                                class="bi bi-chat-dots me-2"></i>Mensaje</a></li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li><a class="dropdown-item text-danger" href="#"><i
-                                                class="bi bi-person-x me-2"></i>Eliminar amigo</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="mt-3 pt-2 border-top d-flex justify-content-between text-secondary small">
-                            <span><i class="bi bi-controller me-1"></i>89 juegos</span>
-                            <span><i class="bi bi-trophy me-1"></i>34 comp.</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Amigo 3 -->
-                <div class="col">
-                    <div class="card border rounded-3 p-3 h-100 shadow-sm">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="rounded-circle bg-info-subtle text-info-emphasis d-flex align-items-center justify-content-center flex-shrink-0"
-                                style="width: 48px; height: 48px;">
-                                <i class="bi bi-person-fill fs-4"></i>
-                            </div>
-                            <div class="flex-grow-1 text-truncate">
-                                <h6 class="fw-bold mb-0 text-truncate">Kratos99</h6>
-                                <span class="badge bg-success-subtle text-success rounded-pill small">Jugando a Elden
-                                    Ring</span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn btn-light btn-sm rounded-circle p-1" type="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                    <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Ver
-                                            perfil</a></li>
-                                    <li><a class="dropdown-item" href="#"><i
-                                                class="bi bi-chat-dots me-2"></i>Mensaje</a></li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li><a class="dropdown-item text-danger" href="#"><i
-                                                class="bi bi-person-x me-2"></i>Eliminar amigo</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="mt-3 pt-2 border-top d-flex justify-content-between text-secondary small">
-                            <span><i class="bi bi-controller me-1"></i>115 juegos</span>
-                            <span><i class="bi bi-trophy me-1"></i>62 comp.</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Amigo 4 -->
-                <div class="col">
-                    <div class="card border rounded-3 p-3 h-100 shadow-sm">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="rounded-circle bg-secondary-subtle text-secondary d-flex align-items-center justify-content-center flex-shrink-0"
-                                style="width: 48px; height: 48px;">
-                                <i class="bi bi-person-fill fs-4"></i>
-                            </div>
-                            <div class="flex-grow-1 text-truncate">
-                                <h6 class="fw-bold mb-0 text-truncate">LuigiBros</h6>
-                                <span
-                                    class="badge bg-secondary-subtle text-secondary rounded-pill small">Desconectado</span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn btn-light btn-sm rounded-circle p-1" type="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                    <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Ver
-                                            perfil</a></li>
-                                    <li><a class="dropdown-item" href="#"><i
-                                                class="bi bi-chat-dots me-2"></i>Mensaje</a></li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li><a class="dropdown-item text-danger" href="#"><i
-                                                class="bi bi-person-x me-2"></i>Eliminar amigo</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="mt-3 pt-2 border-top d-flex justify-content-between text-secondary small">
-                            <span><i class="bi bi-controller me-1"></i>26 juegos</span>
-                            <span><i class="bi bi-trophy me-1"></i>9 comp.</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- Lista de Amigos (se llena desde friends_controller.js) -->
+            <div id="friends_list" class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3"></div>
         </div>
     </main>
 

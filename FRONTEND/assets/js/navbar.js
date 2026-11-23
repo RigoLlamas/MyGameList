@@ -17,6 +17,21 @@ function renderNavbar() {
         </li>`)
         .join('');
 
+    // Búsqueda de personas: solo con sesión (para agregar amigos hay que estar logueado)
+    const buscador = sessionStorage.getItem('user')
+        ? `
+            <form id="navbar_search_form" class="d-flex me-lg-3 my-2 my-lg-0" role="search">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white border-end-0 rounded-start-pill text-secondary">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input id="navbar_search" type="search" class="form-control border-start-0 rounded-end-pill"
+                           placeholder="Buscar personas..." aria-label="Buscar personas">
+                </div>
+            </form>
+        `
+        : '';
+
     const botonSesion = sessionStorage.getItem('user')
         ? `
             <div class="dropdown">
@@ -45,6 +60,7 @@ function renderNavbar() {
                     <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                         ${items}
                     </ul>
+                    ${buscador}
                     ${botonSesion}
                 </div>
             </div>
@@ -80,6 +96,22 @@ if (navbarContainer) {
         btnConfirmLogout.addEventListener('click', () => {
             if (typeof logout === 'function') logout();
             else { sessionStorage.clear(); window.location.href = '/views/login.html'; }
+        });
+    }
+
+    // Buscar personas: redirige a users.html?search=<texto>
+    const formBusqueda = document.getElementById('navbar_search_form');
+    const inputBusqueda = document.getElementById('navbar_search');
+    if (formBusqueda && inputBusqueda) {
+        // Si ya estamos en la página de resultados, mostrar lo que se buscó
+        inputBusqueda.value = new URLSearchParams(window.location.search).get('search') || '';
+
+        formBusqueda.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const texto = inputBusqueda.value.trim();
+            if (!texto) return;
+            const base = typeof VIEWS_URL !== 'undefined' ? VIEWS_URL : '/views/';
+            window.location.href = `${base}users.html?search=${encodeURIComponent(texto)}`;
         });
     }
 }

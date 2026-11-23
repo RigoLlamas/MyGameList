@@ -38,6 +38,14 @@ const userSchema = new mongoose.Schema({
       validator: (arr) => arr.length <= 10,
       message: 'Solo puedes tener un máximo de 10 juegos favoritos'
     }
+  },
+  // Amistad unidireccional y sin aprobación (tipo "seguir"): ids de otros usuarios
+  amigos: {
+    type: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }],
+    default: []
   }
 }, {
   timestamps: true // Genera createdAt automáticamente (reemplaza a joined_at para "Miembro desde")
