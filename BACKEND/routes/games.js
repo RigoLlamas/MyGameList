@@ -5,7 +5,8 @@ const {
   getGames,
   getGameById,
   createGame,
-  syncSteamCatalog
+  syncSteamCatalog,
+  getGameStats
 } = require('../controllers/games_api_controller');
 
 // Rutas de sincronización (deben ir antes de /:id para no chocar con el parámetro)
@@ -13,7 +14,9 @@ router.get('/sync-steam', syncSteamCatalog);
 router.post('/sync-steam', syncSteamCatalog);
 
 router.get('/', getGames);
+router.get('/:id/stats', getGameStats);
 router.get('/:id', getGameById);
 router.post('/', createGame);
+
 
 module.exports = router;

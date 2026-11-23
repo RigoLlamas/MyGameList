@@ -66,6 +66,38 @@ function mostrarJuego(juego) {
   if (favoritesEl) favoritesEl.textContent = (juego.numeroFavoritos ?? 0).toLocaleString('es-MX');
 }
 
+// Pide y muestra las estadísticas de la comunidad
+async function cargarEstadisticas() {
+  const idJuego = juegoActual?._id || juegoId;
+  if (!idJuego) return;
+
+  try {
+    const response = await fetch(`${API_URL}/games/${idJuego}/stats`);
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.mensaje);
+
+    const stats = result.estadisticas;
+    document.getElementById('stats_playing').textContent = stats.jugando;
+    document.getElementById('stats_completed').textContent = stats.completados;
+    document.getElementById('stats_planned').textContent = stats.planeados;
+    document.getElementById('stats_dropped').textContent = stats.abandonados;
+
+    const rating = document.getElementById('stats_rating');
+    if (rating) {
+      if (stats.calificacionMedia === null) {
+        rating.textContent = 'Sin calificaciones';
+      } else {
+        rating.innerHTML = `${stats.calificacionMedia}/10 <i class="bi bi-star-fill text-warning"></i> ` +
+          `<span class="small">(${stats.totalCalificaciones} votos)</span>`;
+      }
+    }
+  } catch (err) {
+    console.error('Error en estadísticas:', err);
+    const rating = document.getElementById('stats_rating');
+    if (rating) rating.textContent = 'No disponible';
+  }
+}
+
 async function cargarDetalle() {
   if (!juegoId && !steamAppId) {
     detailTitle.textContent = 'No se indicó ningún juego';
@@ -88,6 +120,7 @@ async function cargarDetalle() {
 
     juegoActual = result.juego;
     mostrarJuego(juegoActual);
+    await cargarEstadisticas();
   } catch (err) {
     console.error('Error en detalle:', err);
     detailTitle.textContent = 'Juego no encontrado';
