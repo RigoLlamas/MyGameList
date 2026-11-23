@@ -130,13 +130,57 @@ async function cargarDetalle() {
   }
 }
 
-// ==================== AGREGAR A MI LISTA (POST /api/mylist) ====================
+// ==================== AGREGAR / ACTUALIZAR EN MI LISTA (POST y PATCH /api/mylist) ====================
 const ETIQUETAS_ESTADO = {
   playing: 'Jugando',
   completed: 'Completado',
   planned: 'Planeado',
   dropped: 'Abandonado'
 };
+
+let itemEnMiLista = null;
+
+function actualizarBotonLista(estado) {
+  const btnPrincipal = document.getElementById('btn_add_mylist') || document.querySelector('main .btn-group > button:first-child');
+  const btnToggle = document.getElementById('btn_toggle_mylist') || document.querySelector('main .btn-group > .dropdown-toggle');
+  if (!btnPrincipal) return;
+
+  btnPrincipal.classList.remove('btn-primary');
+  btnPrincipal.classList.add('btn-success');
+  if (btnToggle) {
+    btnToggle.classList.remove('btn-primary');
+    btnToggle.classList.add('btn-success');
+  }
+
+  const texto = ETIQUETAS_ESTADO[estado] || 'En mi lista';
+  btnPrincipal.innerHTML = `<i class="bi bi-check-lg me-1"></i> ${texto}`;
+}
+
+async function verificarEstadoEnMiLista() {
+  const user = JSON.parse(sessionStorage.getItem('user') || 'null');
+  if (!user || !juegoActual) return;
+
+  const usuarioId = user._id || user.id;
+  try {
+    const response = await fetch(`${API_URL}/mylist?usuarioId=${encodeURIComponent(usuarioId)}`);
+    const data = await response.json();
+    if (!response.ok || !data.ok || !Array.isArray(data.juegos)) return;
+
+    // Buscar si el juego ya está en la lista del usuario
+    const encontrado = data.juegos.find((item) => {
+      if (juegoActual._id && item.juegoId && String(item.juegoId) === String(juegoActual._id)) return true;
+      if (juegoActual.steamAppId && item.steamAppId && Number(item.steamAppId) === Number(juegoActual.steamAppId)) return true;
+      return item.titulo && juegoActual.titulo && item.titulo.trim().toLowerCase() === juegoActual.titulo.trim().toLowerCase();
+    });
+
+    if (encontrado) {
+      itemEnMiLista = encontrado;
+      actualizarBotonLista(encontrado.estado);
+    }
+  } catch (err) {
+    console.error('Error al verificar estado en mi lista:', err);
+  }
+}
 
 async function agregarAMiLista(estado = 'playing') {
   const user = JSON.parse(sessionStorage.getItem('user') || 'null');
@@ -151,43 +195,53 @@ async function agregarAMiLista(estado = 'playing') {
     return;
   }
 
+  const usuarioId = user._id || user.id;
   const plataformaPrincipal = Array.isArray(juegoActual.plataformas) && juegoActual.plataformas.length > 0
     ? juegoActual.plataformas[0]
     : 'PC';
 
-  const payload = {
-    usuarioId: user._id || user.id,
-    juegoId: juegoActual._id,
-    steamAppId: juegoActual.steamAppId,
-    titulo: juegoActual.titulo,
-    caratula: juegoActual.caratula || '',
-    plataforma: plataformaPrincipal,
-    estado
-  };
-
-  if (typeof showLoading === 'function') showLoading('Agregando a tu lista...');
+  if (typeof showLoading === 'function') showLoading('Guardando en tu lista...');
   try {
-    const response = await fetch(`${API_URL}/mylist`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const result = await response.json();
+    let response;
+    let result;
+
+    if (itemEnMiLista && itemEnMiLista._id) {
+      // Si ya existe, actualiza su estado
+      response = await fetch(`${API_URL}/mylist/${itemEnMiLista._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado })
+      });
+      result = await response.json();
+    } else {
+      // Si no existe, crea una nueva entrada
+      const payload = {
+        usuarioId,
+        juegoId: juegoActual._id,
+        steamAppId: juegoActual.steamAppId,
+        titulo: juegoActual.titulo,
+        caratula: juegoActual.caratula || '',
+        plataforma: plataformaPrincipal,
+        estado
+      };
+
+      response = await fetch(`${API_URL}/mylist`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      result = await response.json();
+    }
 
     if (!response.ok || !result.ok) {
-      throw new Error(result.mensaje || 'No se pudo agregar el juego a tu lista.');
+      throw new Error(result.mensaje || 'No se pudo guardar el juego en tu lista.');
     }
 
-    const btnPrincipal = document.querySelector('main .btn-group > button:first-child');
-    if (btnPrincipal) {
-      btnPrincipal.classList.remove('btn-primary');
-      btnPrincipal.classList.add('btn-success');
-      btnPrincipal.innerHTML = `<i class="bi bi-check-lg me-1"></i> ${ETIQUETAS_ESTADO[estado] || 'En mi lista'}`;
-    }
-
-    alert(`"${juegoActual.titulo}" se agregó a tu lista como "${ETIQUETAS_ESTADO[estado]}".`);
+    itemEnMiLista = result.juego || itemEnMiLista;
+    actualizarBotonLista(estado);
+    alert(`"${juegoActual.titulo}" se guardó en tu lista como "${ETIQUETAS_ESTADO[estado]}".`);
   } catch (err) {
-    console.error('Error al agregar a mi lista:', err);
+    console.error('Error al guardar en mi lista:', err);
     alert(err.message);
   } finally {
     if (typeof hideLoading === 'function') hideLoading();
@@ -195,16 +249,14 @@ async function agregarAMiLista(estado = 'playing') {
 }
 
 function inicializarEventosLista() {
-  const btnGroup = document.querySelector('main .btn-group');
-  if (!btnGroup) return;
-
-  // Botón principal ("Agregar a mi lista") -> agrega por defecto en "playing" (Jugando)
-  const btnPrincipal = btnGroup.querySelector('button:first-child');
+  const btnPrincipal = document.getElementById('btn_add_mylist') || document.querySelector('main .btn-group > button:first-child');
   if (btnPrincipal) {
-    btnPrincipal.addEventListener('click', () => agregarAMiLista('playing'));
+    btnPrincipal.addEventListener('click', () => {
+      const estadoActual = itemEnMiLista ? itemEnMiLista.estado : 'playing';
+      agregarAMiLista(estadoActual);
+    });
   }
 
-  // Opciones del menú desplegable (Jugando, Completado, Planeado, Abandonado)
   const mapaEstados = {
     jugando: 'playing',
     completado: 'completed',
@@ -212,17 +264,29 @@ function inicializarEventosLista() {
     abandonado: 'dropped'
   };
 
-  btnGroup.querySelectorAll('.dropdown-menu .dropdown-item').forEach((item) => {
+  const menuItems = document.querySelectorAll('#dropdown_mylist_menu .dropdown-item, main .btn-group .dropdown-menu .dropdown-item');
+  menuItems.forEach((item) => {
     item.addEventListener('click', (e) => {
       e.preventDefault();
+      const estadoData = item.dataset.estado;
       const texto = item.textContent.trim().toLowerCase();
-      const estado = item.dataset.estado || mapaEstados[texto] || 'playing';
+      const estado = estadoData || mapaEstados[texto] || 'playing';
       agregarAMiLista(estado);
     });
   });
 }
 
-if (detailTitle) {
-  cargarDetalle();
+async function cargarDetalleCompleto() {
+  await cargarDetalle();
+  await verificarEstadoEnMiLista();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    cargarDetalleCompleto();
+    inicializarEventosLista();
+  });
+} else {
+  cargarDetalleCompleto();
   inicializarEventosLista();
 }

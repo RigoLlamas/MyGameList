@@ -48,14 +48,14 @@
         </div>
         <div class="col-auto">
           <div class="btn-group">
-            <button type="button" class="btn btn-primary px-4 py-2">Agregar a mi lista</button>
-            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split px-3"
-              data-bs-toggle="dropdown"></button>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="#">Jugando</a></li>
-              <li><a class="dropdown-item" href="#">Completado</a></li>
-              <li><a class="dropdown-item" href="#">Planeado</a></li>
-              <li><a class="dropdown-item" href="#">Abandonado</a></li>
+            <button id="btn_add_mylist" type="button" class="btn btn-primary px-4 py-2">Agregar a mi lista</button>
+            <button id="btn_toggle_mylist" type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split px-3"
+              data-bs-toggle="dropdown" aria-expanded="false"></button>
+            <ul id="dropdown_mylist_menu" class="dropdown-menu dropdown-menu-end shadow-sm">
+              <li><a class="dropdown-item" href="#" data-estado="playing"><i class="bi bi-controller me-2"></i>Jugando</a></li>
+              <li><a class="dropdown-item" href="#" data-estado="completed"><i class="bi bi-check-circle me-2"></i>Completado</a></li>
+              <li><a class="dropdown-item" href="#" data-estado="planned"><i class="bi bi-clock me-2"></i>Planeado</a></li>
+              <li><a class="dropdown-item" href="#" data-estado="dropped"><i class="bi bi-x-circle me-2"></i>Abandonado</a></li>
             </ul>
           </div>
         </div>
