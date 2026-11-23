@@ -1,66 +1,63 @@
 // BACKEND/controllers/auth_api_controller.js
-const { User, UserException, users } = require('../models/user.js');
+const User = require('../models/user');
+
+// POST /api/auth/register
+const registerUser = async (req, res) => {
+  try {
+    const { nombre, email, password, fechaNacimiento, fotoPerfil } = req.body;
+
+    const existeCorreo = await User.findOne({ email: email?.toLowerCase().trim() });
+    if (existeCorreo) {
+      return res.status(400).json({ ok: false, mensaje: 'Ese correo electrónico ya está registrado.' });
+    }
+
+    const nuevoUsuario = new User({
+      nombre,
+      email,
+      password,
+      fechaNacimiento,
+      fotoPerfil: fotoPerfil || ''
+    });
+
+    await nuevoUsuario.save();
+
+    // Gracias a userSchema.methods.toJSON, la contraseña no se envía en la respuesta
+    res.status(201).json({
+      ok: true,
+      mensaje: 'Usuario registrado exitosamente.',
+      usuario: nuevoUsuario
+    });
+  } catch (error) {
+    // Captura errores de validación de Mongoose (ej. contraseña < 8 caracteres)
+    const primerError = error.errors
+      ? Object.values(error.errors)[0].message
+      : 'Error al registrar el usuario.';
+    res.status(400).json({ ok: false, mensaje: primerError });
+  }
+};
 
 // POST /api/auth/login
-const login = (req, res) => {
+const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: 'Correo y contraseña son requeridos.'
-      });
+      return res.status(400).json({ ok: false, mensaje: 'Ingresa correo y contraseña.' });
     }
 
-    const usuario = users.find(u => u.email === email && u.password === password);
-
-    if (!usuario) {
-      return res.status(401).json({
-        ok: false,
-        mensaje: 'Credenciales inválidas. Revisa tu correo o contraseña.'
-      });
+    const usuario = await User.findOne({ email: email.toLowerCase().trim() });
+    if (!usuario || usuario.password !== password) {
+      return res.status(401).json({ ok: false, mensaje: 'Correo o contraseña incorrectos.' });
     }
 
-    // Responder con datos del usuario
-    res.json(usuario);
-  } catch (error) {
-    res.status(500).json({
-      ok: false,
-      mensaje: 'Error durante el inicio de sesión',
-      error: error.message
+    res.json({
+      ok: true,
+      mensaje: 'Inicio de sesión exitoso.',
+      usuario
     });
+  } catch (error) {
+    res.status(500).json({ ok: false, mensaje: 'Error en el servidor al iniciar sesión.', error: error.message });
   }
 };
 
-// POST /api/auth/logout
-const logout = (req, res) => {
-  res.json({
-    ok: true,
-    mensaje: 'Sesión cerrada exitosamente.'
-  });
-};
-
-// GET /api/auth/me (Verifica el usuario actual mediante el encabezado x-auth)
-const getMe = (req, res) => {
-  const authHeader = req.header('x-auth');
-  const userId = req.header('x-user-id');
-
-  if (!authHeader) {
-    return res.status(401).json({ ok: false, mensaje: 'No autorizado. Falta cabecera de autenticación.' });
-  }
-
-  const usuario = users.find(u => (userId ? u.id === Number(userId) : true) && u.password === authHeader);
-
-  if (!usuario) {
-    return res.status(401).json({ ok: false, mensaje: 'Token o sesión no válida.' });
-  }
-
-  res.json({ ok: true, usuario });
-};
-
-module.exports = {
-  login,
-  logout,
-  getMe
-};
+module.exports = { registerUser, loginUser };

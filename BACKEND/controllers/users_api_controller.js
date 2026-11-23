@@ -1,212 +1,88 @@
-const fs = require('fs');
-const {User, UserException, users} = require('../models/user.js');
+// BACKEND/controllers/users_api_controller.js
+const mongoose = require('mongoose');
+const User = require('../models/user');
 
-//Middleware Auth for users
-exports.authUserMiddleware = (req, res, next) => {
-    if(req.header("x-auth")){
-        let id_user = Number(req.params.id);
-        let foundId = users.find(storedUser => storedUser.id === id_user);
-        if(foundId){
-            if(req.header("x-auth") === foundId.password){
-                next();
-            }
-            else{
-                console.log("Contrasena incorrecta")
-                res.sendStatus(401);            
-            }
-        }
-        else{
-            console.log("Usuario no existe")
-            res.sendStatus(404);
-        }
-    }
-    else{
-        console.log("No Header");
-        res.sendStatus(401);
-    }
-}
-
-exports.registerUser = (req, res) => {
-    try{
-        if(req.body.password != req.body.confirm_password){
-            return res.status(400).send("Error: Password Missmatch")
-        }
-        else{
-            let user = createUser(req.body.name, req.body.email, req.body.password, req.body.birthday);
-            fs.writeFileSync('./database/users.json', JSON.stringify(users, null, 2));
-            res.send(user.toObj());
-        }
-    } catch(error){
-        res.status(400).send(error.errorMessage);
-    }
-}
-exports.getUsers = (req,res)=>{
-    let page = Number(req.query.page) || 1;
-    let limit = Number(req.query.limit) || 10;
-    let start = (page - 1) * limit;
-    let end = start + limit;
-    let paginatedUsers = users.slice(start, end)
-    if(req.header("x-auth") === "admin_auth"){
-            res.json({
-                page,
-                next_page: end < users.length ? page + 1 : null,
-                limit,
-                total: users.length,
-                data: paginatedUsers
-            });
-        }
-        else{
-            res.sendStatus(401);
-        }
-}
-
-exports.getUserById = (req, res) => {
-    let user = innerGetUserById(Number(req.params.id))
-    if(!user){
-        return res.sendStatus(404);
-    }
-     res.json(user);
-}
-
-exports.patchUser = (req, res) => {
-    try{
-        let id = Number(req.params.id)
-        let new_info = req.body;
-        updateUser(id, new_info)
-        fs.writeFileSync('./database/users.json', JSON.stringify(users, null, 2));
-
-        let updatedUser = users.find(user => user.id === id)
-
-        res.json({
-            message: "User Updated",
-            user: updatedUser
-        })
-    } catch(error){
-        res.status(400).send(error.errorMessage || error.message);
-    }
-}
-
-exports.delete = (req, res) => {
-    try{
-        let id = Number(req.params.id);
-        let target_user = users.find(user => user.id === id);
-        deleteUser(id);
-        fs.writeFileSync('./database/users.json', JSON.stringify(users, null, 2));
-
-        res.json({
-            message:"Usuario con id " + id + " Eliminado",
-            user: target_user
-        })
-    }
-    catch(error){
-        res.status(400).send(error.errorMessage || error.message);
-    }  
-}
-
-exports.login = (req, res) => {
-    let data = req.body,
-        user = users.find(user => (user.email == data.email && user.password == data.password))
-    
-    if(user){
-        res.send(user);
-    }
-    else{
-        res.sendStatus(401)
-    }
-}
-//Inner Functions
-function createUser(userName, userMail, userPsswd, userBday){
-    let user = new User(userName, userMail, userPsswd, userBday);
-    users.push(user.toObj());
-    return user;
-}
-
-function innerGetUserById(id){
-    return users.find(storedUser => storedUser.id === id);
-}
-
-function searchUsers(attribute, value){
-    let validAttributes = [
-        "id",
-        "name",
-        "email",
-        "password",
-        "birthday",
-        "joined_at"
-    ]
-
-    if(!validAttributes.includes(attribute)){
-        throw new UserException("Atributo No Existe");
+// GET /api/users/:id
+const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ ok: false, mensaje: 'ID de usuario no válido.' });
     }
 
-    if(attribute === "joined_at"){
-            let searchDate = new Date(value);
-            if(isNaN(searchDate.getTime())){
-                throw new UserException("Fecha No Valida")
-            }
-            return users.filter( checkUsers => {
-                return(
-                    checkUsers.joined_at.getFullYear() === searchDate.getFullYear() &&
-                    checkUsers.joined_at.getMonth() === searchDate.getMonth() &&
-                    checkUsers.joined_at.getDate() === searchDate.getDate()
-                )
-            })
-        }
-    
-    if(attribute === "id"){
-        let newValue = Number(value);
-        return users.filter( checkUsers => {
-            return checkUsers.id === newValue;
-        })
+    const usuario = await User.findById(id).populate('favoritos');
+    if (!usuario) {
+      return res.status(404).json({ ok: false, mensaje: 'Usuario no encontrado.' });
     }
 
-    return users.filter( checkUsers => {
-        return checkUsers[attribute].includes(value);
-    })
-}
+    res.json({ ok: true, usuario });
+  } catch (error) {
+    res.status(500).json({ ok: false, mensaje: 'Error al obtener perfil.', error: error.message });
+  }
+};
 
-function getAllUsers(){
-    let allUsers = users.slice();
-    return allUsers;
-}
-
-function updateUser(id, obj_new_info){
-    let user_mod = users.find(storedUser => storedUser.id === id);
-    let validAttributes = [
-        "name",
-        "email",
-        "password",
-        "birthday",
-        "bio"
-    ]
-    if(!user_mod){
-        throw new UserException("ID Usuario No Existe")
+// PUT /api/users/:id (Actualizar foto de perfil, fecha de nacimiento o nombre)
+const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ ok: false, mensaje: 'ID de usuario no válido.' });
     }
 
-    const changes = {} //Reolector de cambios
-    for(let attribute in obj_new_info){
-        if(validAttributes.includes(attribute)){
-            if(user_mod[attribute] !== obj_new_info[attribute]){
-                User.validate(attribute, obj_new_info[attribute], id);
-                changes[attribute] = obj_new_info[attribute]
-            }
-        }
-    }
-    
-    if(Object.keys(changes).length === 0){ //Los atributos a cambiar son 0?
-        throw new UserException("No se realizaron modificaciones") //Arroja excepcion
+    const { nombre, fechaNacimiento, fotoPerfil } = req.body;
+    const cambios = {};
+
+    if (nombre !== undefined) cambios.nombre = nombre;
+    if (fechaNacimiento !== undefined) cambios.fechaNacimiento = fechaNacimiento;
+    if (fotoPerfil !== undefined) cambios.fotoPerfil = fotoPerfil;
+
+    if (Object.keys(cambios).length === 0) {
+      return res.status(400).json({ ok: false, mensaje: 'No se enviaron campos para actualizar.' });
     }
 
-    Object.assign(user_mod, changes) //Asigna los cambios al usuario a modificar
-    return true;
-}
+    const usuarioActualizado = await User.findByIdAndUpdate(
+      id,
+      cambios,
+      { returnDocument: 'after', runValidators: true }
+    );
 
-function deleteUser(id){
-    let userDelete = users.find(storedUser => storedUser.id === id);
-    if(!userDelete){
-        throw new UserException("Id Usuario No Existe");
+    if (!usuarioActualizado) {
+      return res.status(404).json({ ok: false, mensaje: 'Usuario no encontrado.' });
     }
 
-    let indexDelete = users.indexOf(userDelete);
-    users.splice(indexDelete,1);
-}
+    res.json({
+      ok: true,
+      mensaje: 'Perfil actualizado correctamente.',
+      usuario: usuarioActualizado
+    });
+  } catch (error) {
+    const primerError = error.errors
+      ? Object.values(error.errors)[0].message
+      : 'Error al actualizar el perfil.';
+    res.status(400).json({ ok: false, mensaje: primerError });
+  }
+};
+
+// DELETE /api/users/:id
+const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ ok: false, mensaje: 'ID de usuario no válido.' });
+    }
+
+    const usuarioEliminado = await User.findByIdAndDelete(id);
+    if (!usuarioEliminado) {
+      return res.status(404).json({ ok: false, mensaje: 'Usuario no encontrado.' });
+    }
+
+    res.json({
+      ok: true,
+      mensaje: 'Cuenta eliminada permanentemente.'
+    });
+  } catch (error) {
+    res.status(500).json({ ok: false, mensaje: 'Error al eliminar la cuenta.', error: error.message });
+  }
+};
+
+module.exports = { getUserById, updateUser, deleteUser };
