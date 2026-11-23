@@ -128,7 +128,7 @@ const updateGenre = async (req, res) => {
     const generoActualizado = await Genre.findByIdAndUpdate(
       id,
       updates,
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     );
 
     if (!generoActualizado) {

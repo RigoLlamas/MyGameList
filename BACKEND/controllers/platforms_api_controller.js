@@ -133,7 +133,7 @@ const updatePlatform = async (req, res) => {
     const plataformaActualizada = await Platform.findByIdAndUpdate(
       id,
       updates,
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     );
 
     if (!plataformaActualizada) {

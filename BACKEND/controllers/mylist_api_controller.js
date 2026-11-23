@@ -205,7 +205,7 @@ const updateMyListGame = async (req, res) => {
     const itemActualizado = await UserGame.findByIdAndUpdate(
       id,
       updates,
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     );
 
     if (!itemActualizado) {
