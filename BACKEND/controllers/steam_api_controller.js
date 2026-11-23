@@ -1,7 +1,7 @@
 const Game = require('../models/game');
 const { asegurarGenerosYPlataformas } = require('./games_api_controller');
 
-const HARDWARE_REGEX = /steam deck|valve index|docking station|steam controller|steam link|vr headset|dev kit/i;
+const HARDWARE_REGEX = /steam frame|steam machine|steam deck|valve index|docking station|steam controller|steam link|vr headset|dev kit|soundtrack|artbook/i;
 
 function esHardwarePorNombre(titulo = '') {
   return HARDWARE_REGEX.test(titulo);
