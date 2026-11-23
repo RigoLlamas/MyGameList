@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 const UserGame = require('../models/user_game');
 const Game = require('../models/game');
+const { asegurarGenerosYPlataformas } = require('./games_api_controller');
 
 // GET /api/mylist - Obtener la lista de juegos de un usuario (filtro opcional por estado y favorito)
 const getMyList = async (req, res) => {
@@ -147,6 +148,7 @@ const addGameToMyList = async (req, res) => {
     });
 
     await nuevoItem.save();
+    await asegurarGenerosYPlataformas([], [nuevoItem.plataforma]);
 
     res.status(201).json({
       ok: true,

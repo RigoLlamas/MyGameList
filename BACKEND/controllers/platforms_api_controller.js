@@ -1,11 +1,46 @@
 // BACKEND/controllers/platforms_api_controller.js
 const mongoose = require('mongoose');
 const Platform = require('../models/platform');
+const Game = require('../models/game');
+
+const MAPA_PLATAFORMAS = {
+  'PC': { nombre: 'PC Master Race', codigo: 'PC', color: '#0284c7' },
+  'Mac': { nombre: 'Apple Mac', codigo: 'Mac', color: '#64748b' },
+  'Linux': { nombre: 'Linux', codigo: 'Linux', color: '#ea580c' },
+  'Switch': { nombre: 'Nintendo Switch', codigo: 'Switch', color: '#e11d48' },
+  'PS5': { nombre: 'PlayStation 5', codigo: 'PS5', color: '#2563eb' },
+  'PS4': { nombre: 'PlayStation 4', codigo: 'PS4', color: '#1d4ed8' },
+  'Xbox': { nombre: 'Xbox Series X/S', codigo: 'Xbox', color: '#16a34a' },
+  'Xbox One': { nombre: 'Xbox One', codigo: 'Xbox One', color: '#15803d' },
+  'Wii U': { nombre: 'Nintendo Wii U', codigo: 'Wii U', color: '#0891b2' }
+};
 
 // GET /api/platforms - Obtener todas las plataformas
 const getPlatforms = async (req, res) => {
   try {
-    const plataformas = await Platform.find().sort({ nombre: 1 });
+    let plataformas = await Platform.find().sort({ nombre: 1 });
+
+    // Si la colección está vacía, sincronizar a partir de las plataformas de los juegos existentes
+    if (plataformas.length === 0) {
+      const plataformasEnJuegos = await Game.distinct('plataformas');
+      for (const p of plataformasEnJuegos) {
+        if (!p || !p.trim()) continue;
+        const cod = p.trim();
+        const meta = MAPA_PLATAFORMAS[cod] || { nombre: cod, codigo: cod, color: '#0369a1' };
+        await Platform.findOneAndUpdate(
+          {
+            $or: [
+              { codigo: { $regex: `^${cod}$`, $options: 'i' } },
+              { nombre: { $regex: `^${meta.nombre}$`, $options: 'i' } }
+            ]
+          },
+          { $setOnInsert: { nombre: meta.nombre, codigo: meta.codigo, color: meta.color } },
+          { upsert: true, returnDocument: 'after' }
+        );
+      }
+      plataformas = await Platform.find().sort({ nombre: 1 });
+    }
+
     res.json({
       ok: true,
       total: plataformas.length,

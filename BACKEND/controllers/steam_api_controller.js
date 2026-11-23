@@ -1,4 +1,5 @@
 const Game = require('../models/game');
+const { asegurarGenerosYPlataformas } = require('./games_api_controller');
 
 // Helper para normalizar plataformas booleanas de Steam a nombres del sistema
 function mapearPlataformasSteam(platformsObj = {}) {
@@ -69,6 +70,7 @@ const getSteamGameDetail = async (req, res) => {
     });
 
     await nuevoJuego.save();
+    await asegurarGenerosYPlataformas(nuevoJuego.generos, nuevoJuego.plataformas);
     res.json({ ok: true, fuente: 'steam', juego: nuevoJuego });
   } catch (error) {
     res.status(500).json({ ok: false, mensaje: 'Error al obtener detalle de Steam', error: error.message });

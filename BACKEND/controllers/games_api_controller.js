@@ -1,6 +1,21 @@
 // BACKEND/controllers/games_api_controller.js
 const mongoose = require('mongoose');
 const Game = require('../models/game');
+const Genre = require('../models/genre');
+const Platform = require('../models/platform');
+
+// Mapa de plataformas conocidas con colores y nombres descriptivos
+const MAPA_PLATAFORMAS = {
+  'PC': { nombre: 'PC Master Race', codigo: 'PC', color: '#0284c7' },
+  'Mac': { nombre: 'Apple Mac', codigo: 'Mac', color: '#64748b' },
+  'Linux': { nombre: 'Linux', codigo: 'Linux', color: '#ea580c' },
+  'Switch': { nombre: 'Nintendo Switch', codigo: 'Switch', color: '#e11d48' },
+  'PS5': { nombre: 'PlayStation 5', codigo: 'PS5', color: '#2563eb' },
+  'PS4': { nombre: 'PlayStation 4', codigo: 'PS4', color: '#1d4ed8' },
+  'Xbox': { nombre: 'Xbox Series X/S', codigo: 'Xbox', color: '#16a34a' },
+  'Xbox One': { nombre: 'Xbox One', codigo: 'Xbox One', color: '#15803d' },
+  'Wii U': { nombre: 'Nintendo Wii U', codigo: 'Wii U', color: '#0891b2' }
+};
 
 // Helper para normalizar plataformas de Steam a nombres estándar
 function mapearPlataformasSteam(platformsObj = {}) {
@@ -11,7 +26,58 @@ function mapearPlataformasSteam(platformsObj = {}) {
   return plataformas.length > 0 ? plataformas : ['PC'];
 }
 
-// Helper: Obtiene el detalle de un juego desde Steam Store API y lo persiste/actualiza en MongoDB
+// Sincroniza automáticamente los géneros y plataformas en sus respectivas colecciones de MongoDB
+async function asegurarGenerosYPlataformas(generos = [], plataformas = []) {
+  try {
+    // 1. Guardar géneros nuevos en la colección Genre
+    for (const g of generos) {
+      if (!g || !g.trim()) continue;
+      const nombreG = g.trim();
+      await Genre.findOneAndUpdate(
+        { nombre: { $regex: `^${nombreG}$`, $options: 'i' } },
+        {
+          $setOnInsert: {
+            nombre: nombreG,
+            descripcion: `Género oficial: ${nombreG}`
+          }
+        },
+        { upsert: true, returnDocument: 'after' }
+      );
+    }
+
+    // 2. Guardar plataformas nuevas en la colección Platform
+    for (const p of plataformas) {
+      if (!p || !p.trim()) continue;
+      const cod = p.trim();
+      const meta = MAPA_PLATAFORMAS[cod] || {
+        nombre: cod,
+        codigo: cod,
+        color: '#0369a1'
+      };
+
+      await Platform.findOneAndUpdate(
+        {
+          $or: [
+            { codigo: { $regex: `^${cod}$`, $options: 'i' } },
+            { nombre: { $regex: `^${meta.nombre}$`, $options: 'i' } }
+          ]
+        },
+        {
+          $setOnInsert: {
+            nombre: meta.nombre,
+            codigo: meta.codigo,
+            color: meta.color
+          }
+        },
+        { upsert: true, returnDocument: 'after' }
+      );
+    }
+  } catch (error) {
+    console.error('Error al sincronizar taxonomías (géneros/plataformas):', error.message);
+  }
+}
+
+// Helper: Obtiene el detalle de un juego desde Steam Store API y lo persiste en MongoDB
 async function obtenerODescargarDetalleSteam(appid) {
   try {
     const appIdNum = Number(appid);
@@ -19,7 +85,10 @@ async function obtenerODescargarDetalleSteam(appid) {
 
     // Verificar si ya existe en MongoDB
     let juegoExistente = await Game.findOne({ steamAppId: appIdNum });
-    if (juegoExistente) return juegoExistente;
+    if (juegoExistente) {
+      await asegurarGenerosYPlataformas(juegoExistente.generos, juegoExistente.plataformas);
+      return juegoExistente;
+    }
 
     const url = `https://store.steampowered.com/api/appdetails?appids=${appIdNum}&l=spanish`;
     const response = await fetch(url);
@@ -30,6 +99,10 @@ async function obtenerODescargarDetalleSteam(appid) {
 
     const info = appData.data;
     const anio = info.release_date?.date ? String(info.release_date.date).slice(-4) : '2024';
+    const generosExtraidos = info.genres && info.genres.length > 0
+      ? info.genres.map((g) => g.description)
+      : ['Acción'];
+    const plataformasExtraidas = mapearPlataformasSteam(info.platforms);
 
     const juegoDoc = {
       steamAppId: appIdNum,
@@ -37,17 +110,24 @@ async function obtenerODescargarDetalleSteam(appid) {
       sinopsis: info.short_description || 'Sin sinopsis disponible.',
       anioSalida: !isNaN(anio) && anio.length === 4 ? anio : '2024',
       caratula: info.header_image || '',
-      generos: info.genres && info.genres.length > 0 ? info.genres.map((g) => g.description) : ['Acción'],
-      plataformas: mapearPlataformasSteam(info.platforms),
+      generos: generosExtraidos,
+      plataformas: plataformasExtraidas,
       promedioHoras: 0,
       numeroFavoritos: 0
     };
 
-    return await Game.findOneAndUpdate(
+    const juegoGuardado = await Game.findOneAndUpdate(
       { steamAppId: appIdNum },
       { $setOnInsert: juegoDoc },
       { upsert: true, returnDocument: 'after' }
     );
+
+    // Sincronizar géneros y plataformas en sus colecciones para las secciones 6 y 7
+    if (juegoGuardado) {
+      await asegurarGenerosYPlataformas(juegoGuardado.generos, juegoGuardado.plataformas);
+    }
+
+    return juegoGuardado;
   } catch (error) {
     console.error(`Error al consultar detalle de Steam para AppID ${appid}:`, error.message);
     return null;
@@ -185,6 +265,9 @@ const getGameById = async (req, res) => {
       return res.status(404).json({ ok: false, mensaje: 'Videojuego no encontrado.' });
     }
 
+    // Asegurar que sus géneros y plataformas estén registrados
+    await asegurarGenerosYPlataformas(juego.generos, juego.plataformas);
+
     res.json({ ok: true, juego });
   } catch (error) {
     res.status(500).json({ ok: false, mensaje: 'Error al obtener detalle del juego', error: error.message });
@@ -196,6 +279,7 @@ const createGame = async (req, res) => {
   try {
     const nuevoJuego = new Game(req.body);
     await nuevoJuego.save();
+    await asegurarGenerosYPlataformas(nuevoJuego.generos, nuevoJuego.plataformas);
     res.status(201).json({ ok: true, juego: nuevoJuego });
   } catch (error) {
     res.status(400).json({ ok: false, mensaje: 'No se pudo crear el juego', error: error.message });
@@ -208,7 +292,6 @@ const syncSteamCatalog = async (req, res) => {
     const steamId = req.query.steamId;
     const apiKey = process.env.STEAM_API_KEY;
 
-    // Si viene un steamId y hay STEAM_API_KEY, sincroniza los juegos de esa biblioteca
     if (steamId && apiKey) {
       const url = `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${apiKey}&steamid=${steamId}&format=json&include_appinfo=true`;
       const response = await fetch(url);
@@ -221,7 +304,6 @@ const syncSteamCatalog = async (req, res) => {
         }
       }
     } else {
-      // Sincroniza juegos populares de Steam Store
       await autoPoblarCatalogoDesdeSteam();
     }
 
@@ -240,5 +322,7 @@ module.exports = {
   getGames,
   getGameById,
   createGame,
-  syncSteamCatalog
+  syncSteamCatalog,
+  asegurarGenerosYPlataformas,
+  MAPA_PLATAFORMAS
 };

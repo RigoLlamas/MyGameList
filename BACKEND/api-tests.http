@@ -156,7 +156,7 @@ Accept: application/json
 
 ### 4.0b Sincronizar Catálogo usando STEAM_API_KEY y un Steam ID de usuario
 # Reemplaza 76561199247482267 por cualquier Steam ID de 64 bits con perfil público
-GET {{baseUrl}}/games/sync-steam?steamId=76561199247482267
+GET {{baseUrl}}/games/sync-steam?steamId=76561198275784170
 Accept: application/json
 
 ### 4.1 Listar Juegos del Catálogo (Paginación por defecto: página 1, 8 juegos)
@@ -164,11 +164,11 @@ GET {{baseUrl}}/games
 Accept: application/json
 
 ### 4.2 Búsqueda por Título (Parámetro "search")
-GET {{baseUrl}}/games?search=zelda
+GET {{baseUrl}}/games?search=Hades
 Accept: application/json
 
 ### 4.3 Filtrado por Género y Ordenamiento Alfabético
-GET {{baseUrl}}/games?genre=RPG&sort=nombre
+GET {{baseUrl}}/games?genre=Rol&sort=nombre
 Accept: application/json
 
 ### 4.4 Filtrado por Plataforma, Ordenado por Horas y con Límite Personalizado
@@ -179,29 +179,12 @@ Accept: application/json
 GET {{baseUrl}}/games?sort=anio&limit=5
 Accept: application/json
 
-### 4.6 Crear Videojuego Manualmente en el Catálogo
-# @name crearJuego
-POST {{baseUrl}}/games
-Content-Type: {{contentType}}
-
-{
-  "titulo": "Hollow Knight: Silksong (Prueba API)",
-  "sinopsis": "Explora un vasto reino encantado en la secuela del aclamado juego de acción y aventura.",
-  "anioSalida": "2025",
-  "caratula": "https://cdn.cloudflare.steamstatic.com/steam/apps/1030300/header.jpg",
-  "generos": ["Metroidvania", "Aventura", "Acción"],
-  "plataformas": ["PC", "Switch", "PS5", "Xbox"],
-  "promedioHoras": 35,
-  "numeroFavoritos": 1250
-}
-
-### 4.7 Obtener Detalle de un Juego por su ID de MongoDB
-# (Reemplaza con un _id válido del catálogo)
-GET {{baseUrl}}/games/67401234567890abcdef1234
+### 4.6 Obtener Detalle de un Juego por su ID de MongoDB
+GET {{baseUrl}}/games/6b038fb099f104ac6221295d
 Accept: application/json
 
-### 4.8 Obtener Detalle de un Juego por su steamAppId numérico (ej. 1030300)
-GET {{baseUrl}}/games/1030300
+### 4.7 Obtener Detalle de un Juego por su steamAppId numérico (ej. 312530)
+GET {{baseUrl}}/games/312530
 Accept: application/json
 
 
@@ -221,16 +204,6 @@ Accept: application/json
 GET {{baseUrl}}/steam/search?term=
 Accept: application/json
 
-### 5.4 Detalle de un Videojuego desde Steam (Guarda o consulta caché en MongoDB)
-# AppID 620 = Portal 2
-GET {{baseUrl}}/steam/game/620
-Accept: application/json
-
-### 5.5 Detalle desde Steam: AppID Inexistente (Debe retornar 404)
-GET {{baseUrl}}/steam/game/999999999
-Accept: application/json
-
-
 ### ====================================================================
 ### 6. TAXONOMÍAS: GÉNEROS (/api/genres)
 ### ====================================================================
@@ -239,87 +212,12 @@ Accept: application/json
 GET {{baseUrl}}/genres
 Accept: application/json
 
-### 6.2 Crear Nuevo Género
-# @name crearGenero
-POST {{baseUrl}}/genres
-Content-Type: {{contentType}}
-
-{
-  "nombre": "Roguelike Deckbuilder",
-  "descripcion": "Juegos que combinan mecánicas roguelike con construcción progresiva de mazos de cartas."
-}
-
-### 6.3 Crear Género Duplicado (Debe retornar 400)
-POST {{baseUrl}}/genres
-Content-Type: {{contentType}}
-
-{
-  "nombre": "Roguelike Deckbuilder"
-}
-
-### 6.4 Crear Género con Nombre Vacío (Debe retornar 400)
-POST {{baseUrl}}/genres
-Content-Type: {{contentType}}
-
-{
-  "nombre": "   "
-}
-
-### 6.5 Actualizar Género
-# (Reemplaza {{genreId}} con el _id generado)
-@genreId = 6741234567890abcdef12345
-PUT {{baseUrl}}/genres/{{genreId}}
-Content-Type: {{contentType}}
-
-{
-  "descripcion": "Descripción actualizada: Combates estratégicos basados en cartas y generación procedural."
-}
-
-### 6.6 Eliminar Género
-DELETE {{baseUrl}}/genres/{{genreId}}
-Accept: application/json
-
-
 ### ====================================================================
 ### 7. TAXONOMÍAS: PLATAFORMAS (/api/platforms)
 ### ====================================================================
 
 ### 7.1 Listar todas las Plataformas
 GET {{baseUrl}}/platforms
-Accept: application/json
-
-### 7.2 Crear Nueva Plataforma
-# @name crearPlataforma
-POST {{baseUrl}}/platforms
-Content-Type: {{contentType}}
-
-{
-  "nombre": "Nintendo Switch OLED",
-  "codigo": "Switch",
-  "color": "#e60012"
-}
-
-### 7.3 Crear Plataforma Duplicada (Debe retornar 400)
-POST {{baseUrl}}/platforms
-Content-Type: {{contentType}}
-
-{
-  "nombre": "Nintendo Switch OLED"
-}
-
-### 7.4 Actualizar Plataforma
-# (Reemplaza {{platformId}} con el _id generado)
-@platformId = 6741234567890abcdef12345
-PATCH {{baseUrl}}/platforms/{{platformId}}
-Content-Type: {{contentType}}
-
-{
-  "color": "#c4000f",
-  "codigo": "SW-OLED"
-}
-
-### 7.5 Eliminar Plataforma
-DELETE {{baseUrl}}/platforms/{{platformId}}
 Accept: application/json
 
 

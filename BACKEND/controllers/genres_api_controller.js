@@ -1,11 +1,28 @@
 // BACKEND/controllers/genres_api_controller.js
 const mongoose = require('mongoose');
 const Genre = require('../models/genre');
+const Game = require('../models/game');
 
 // GET /api/genres - Obtener todos los géneros
 const getGenres = async (req, res) => {
   try {
-    const generos = await Genre.find().sort({ nombre: 1 });
+    let generos = await Genre.find().sort({ nombre: 1 });
+
+    // Si la colección está vacía, sincronizar automáticamente a partir de los géneros existentes en los juegos
+    if (generos.length === 0) {
+      const generosEnJuegos = await Game.distinct('generos');
+      for (const g of generosEnJuegos) {
+        if (!g || !g.trim()) continue;
+        const nombreG = g.trim();
+        await Genre.findOneAndUpdate(
+          { nombre: { $regex: `^${nombreG}$`, $options: 'i' } },
+          { $setOnInsert: { nombre: nombreG, descripcion: `Género oficial: ${nombreG}` } },
+          { upsert: true, returnDocument: 'after' }
+        );
+      }
+      generos = await Genre.find().sort({ nombre: 1 });
+    }
+
     res.json({
       ok: true,
       total: generos.length,
