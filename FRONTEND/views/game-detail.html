@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Legend of Zelda: Breath of the Wild - MyGameList</title>
+  <title>Detalles del Juego</title>
   <!-- CSS Bootstrap & Iconos -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="../assets/css/styles.css">
   <!--JS de autenticacion de usuarios-->
   <script src="../controllers/env.js" defer></script>
+  <script src="../controllers/game_detail_controller.js" defer></script>
   <script src="../controllers/auth_controller.js" defer></script>
   <!--JS de la barra de navegacion-->
   <script src="../assets/js/navbar.js" defer></script>
@@ -34,16 +35,15 @@
       <!-- Encabezado del Juego -->
       <div class="row align-items-start mb-4">
         <div class="col-auto">
-          <div class="cover-placeholder text-secondary">
+          <div id="detail_cover" class="cover-placeholder text-secondary">
             <i class="bi bi-image fs-1 opacity-50"></i>
           </div>
         </div>
         <div class="col">
-          <h1 class="fw-bold mb-2">The Legend of Zelda: Breath of the Wild</h1>
-          <p class="text-secondary fs-5 mb-3">2017 &nbsp;|&nbsp; Aventura, Mundo abierto</p>
-          <div class="d-flex gap-2 mb-3">
-            <span class="badge badge-switch px-3 py-2 rounded-pill fw-medium">Switch</span>
-            <span class="badge badge-wiiu px-3 py-2 rounded-pill fw-medium">Wii U</span>
+          <h1 id="detail_title" class="fw-bold mb-2">Cargando...</h1>
+          <p id="detail_subtitle" class="text-secondary fs-5 mb-3"></p>
+          <div id="detail_badges" class="d-flex flex-wrap gap-2 mb-3">
+            
           </div>
         </div>
         <div class="col-auto">
@@ -77,23 +77,20 @@
         <!-- Detalle de Información -->
         <div id="content-info">
           <h5 class="fw-bold mb-3">Sinopsis</h5>
-          <p class="text-secondary mb-4">
-            Explora un vasto mundo abierto en esta aventura de The Legend of Zelda, donde la libertad y la exploración son
-            la clave.
-          </p>
+          <p id="detail_synopsis" class="text-secondary mb-4"> </p>
 
           <div class="row g-3">
             <div class="col-sm-4 fw-bold">Plataformas:</div>
-            <div class="col-sm-8 text-secondary">Switch, Wii U</div>
+            <div id="detail_platforms" class="col-sm-8 text-secondary"></div>
 
             <div class="col-sm-4 fw-bold">Año de salida:</div>
-            <div class="col-sm-8 text-secondary">2017</div>
+            <div id="detail_year" class="col-sm-8 text-secondary"></div>
 
             <div class="col-sm-4 fw-bold">Promedio de horas:</div>
-            <div class="col-sm-8 text-secondary">50 h</div>
+            <div id="detail_hours" class="col-sm-8 text-secondary"></div>
 
             <div class="col-sm-4 fw-bold">Número de favoritos:</div>
-            <div class="col-sm-8 text-secondary">12,345</div>
+            <div id="detail_favorites" class="col-sm-8 text-secondary"></div>
           </div>
         </div>
 
