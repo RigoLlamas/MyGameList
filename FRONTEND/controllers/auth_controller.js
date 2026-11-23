@@ -252,8 +252,21 @@ function init() {
             });
         }
 
-        if (avatarEl && usuario.fotoPerfil) {
-            avatarEl.src = usuario.fotoPerfil;
+        const placeholderEl = document.getElementById('user_avatar_placeholder');
+        if (avatarEl) {
+            const mostrarPlaceholder = () => {
+                avatarEl.classList.add('d-none');
+                placeholderEl?.classList.remove('d-none');
+            };
+
+            if (usuario.fotoPerfil) {
+                avatarEl.onerror = mostrarPlaceholder;      // si el link está roto, regresa el ícono
+                avatarEl.src = usuario.fotoPerfil;
+                avatarEl.classList.remove('d-none');
+                placeholderEl?.classList.add('d-none');
+            } else {
+                mostrarPlaceholder();
+            }
         }
     }
 
