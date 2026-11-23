@@ -141,6 +141,13 @@ const getFriends = async (req, res) => {
   }
 };
 
+// Amistad mutua y sin aprobación: cada operación escribe en los DOS usuarios.
+// Devuelve la lista de amigos actualizada de :id (solo datos públicos).
+async function listaAmigos(id) {
+  const usuario = await User.findById(id).populate('amigos', CAMPOS_PUBLICOS);
+  return usuario.amigos;
+}
+
 // POST /api/users/:id/friends/:amigoId
 const addFriend = async (req, res) => {
   try {
@@ -163,16 +170,16 @@ const addFriend = async (req, res) => {
       return res.status(400).json({ ok: false, mensaje: `${amigo.nombre} ya está en tu lista de amigos.` });
     }
 
-    const actualizado = await User.findByIdAndUpdate(
-      id,
-      { $addToSet: { amigos: amigoId } },
-      { returnDocument: 'after' }
-    ).populate('amigos', CAMPOS_PUBLICOS);
+    // Agregar en ambos sentidos: el amigo entra en mi lista y yo en la suya
+    await Promise.all([
+      User.updateOne({ _id: id }, { $addToSet: { amigos: amigoId } }),
+      User.updateOne({ _id: amigoId }, { $addToSet: { amigos: id } })
+    ]);
 
     res.status(201).json({
       ok: true,
-      mensaje: `${amigo.nombre} se agregó a tus amigos.`,
-      amigos: actualizado.amigos
+      mensaje: `Ahora tú y ${amigo.nombre} son amigos.`,
+      amigos: await listaAmigos(id)
     });
   } catch (error) {
     res.status(500).json({ ok: false, mensaje: 'Error al agregar amigo.', error: error.message });
@@ -195,16 +202,16 @@ const removeFriend = async (req, res) => {
       return res.status(404).json({ ok: false, mensaje: 'Ese usuario no está en tu lista de amigos.' });
     }
 
-    const actualizado = await User.findByIdAndUpdate(
-      id,
-      { $pull: { amigos: amigoId } },
-      { returnDocument: 'after' }
-    ).populate('amigos', CAMPOS_PUBLICOS);
+    // Eliminar en ambos sentidos: la amistad se rompe para los dos
+    await Promise.all([
+      User.updateOne({ _id: id }, { $pull: { amigos: amigoId } }),
+      User.updateOne({ _id: amigoId }, { $pull: { amigos: id } })
+    ]);
 
     res.json({
       ok: true,
-      mensaje: 'Amigo eliminado de tu lista.',
-      amigos: actualizado.amigos
+      mensaje: 'Amigo eliminado. Ya no son amigos.',
+      amigos: await listaAmigos(id)
     });
   } catch (error) {
     res.status(500).json({ ok: false, mensaje: 'Error al eliminar amigo.', error: error.message });
