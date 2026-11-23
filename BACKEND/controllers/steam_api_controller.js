@@ -84,11 +84,29 @@ const getPopularSteamGames = async (req, res) => {
     const response = await fetch(url);
     const data = await response.json();
 
-    const populares = (data.top_sellers?.items || []).slice(0, 8).map((item) => ({
-      steamAppId: item.id,
-      titulo: item.name,
-      caratula: item.large_capsule_image || item.header_image
-    }));
+    const hardwareRegex = /steam deck|valve index|docking station|steam controller|steam link|vr headset/i;
+    const idsVistos = new Set();
+
+    const candidatos = [
+      ...(data.top_sellers?.items || []),
+      ...(data.new_releases?.items || [])
+    ];
+
+    const populares = candidatos
+      .filter((item) => {
+        if (!item || !item.id || idsVistos.has(item.id)) return false;
+        if (item.type !== undefined && item.type !== 0) return false;
+        if (hardwareRegex.test(item.name || '')) return false;
+
+        idsVistos.add(item.id);
+        return true;
+      })
+      .slice(0, 8)
+      .map((item) => ({
+        steamAppId: item.id,
+        titulo: item.name,
+        caratula: item.large_capsule_image || item.header_image
+      }));
 
     res.json({ ok: true, juegos: populares });
   } catch (error) {
