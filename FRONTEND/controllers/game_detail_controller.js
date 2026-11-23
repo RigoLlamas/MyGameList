@@ -81,30 +81,8 @@ async function cargarEstadisticas() {
     document.getElementById('stats_completed').textContent = stats.completados;
     document.getElementById('stats_planned').textContent = stats.planeados;
     document.getElementById('stats_dropped').textContent = stats.abandonados;
-
-    const hoursEl = document.getElementById('detail_hours');
-    if (hoursEl && stats.promedioHoras !== undefined) {
-      hoursEl.textContent = `${stats.promedioHoras} h`;
-    }
-
-    const favoritesEl = document.getElementById('detail_favorites');
-    if (favoritesEl && stats.numeroFavoritos !== undefined) {
-      favoritesEl.textContent = Number(stats.numeroFavoritos).toLocaleString('es-MX');
-    }
-
-    const rating = document.getElementById('stats_rating');
-    if (rating) {
-      if (stats.calificacionMedia === null) {
-        rating.textContent = 'Sin calificaciones';
-      } else {
-        rating.innerHTML = `${stats.calificacionMedia}/10 <i class="bi bi-star-fill text-warning"></i> ` +
-          `<span class="small">(${stats.totalCalificaciones} votos)</span>`;
-      }
-    }
   } catch (err) {
     console.error('Error en estadísticas:', err);
-    const rating = document.getElementById('stats_rating');
-    if (rating) rating.textContent = 'No disponible';
   }
 }
 
