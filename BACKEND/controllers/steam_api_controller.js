@@ -1,6 +1,12 @@
 const Game = require('../models/game');
 const { asegurarGenerosYPlataformas } = require('./games_api_controller');
 
+const HARDWARE_REGEX = /steam deck|valve index|docking station|steam controller|steam link|vr headset|dev kit/i;
+
+function esHardwarePorNombre(titulo = '') {
+  return HARDWARE_REGEX.test(titulo);
+}
+
 // Helper para normalizar plataformas booleanas de Steam a nombres del sistema
 function mapearPlataformasSteam(platformsObj = {}) {
   const plataformas = [];
@@ -22,14 +28,16 @@ const searchSteamGames = async (req, res) => {
     const response = await fetch(url);
     const data = await response.json();
 
-    const resultados = (data.items || []).map((item) => ({
-      steamAppId: item.id,
-      titulo: item.name,
-      caratula: item.tiny_image,
-      plataformas: mapearPlataformasSteam(item.platforms)
-    }));
+    const resultados = (data.items || [])
+      .filter((item) => item && item.id && !esHardwarePorNombre(item.name))
+      .map((item) => ({
+        steamAppId: item.id,
+        titulo: item.name,
+        caratula: item.tiny_image,
+        plataformas: mapearPlataformasSteam(item.platforms)
+      }));
 
-    res.json({ ok: true, total: data.total || resultados.length, juegos: resultados });
+    res.json({ ok: true, total: resultados.length, juegos: resultados });
   } catch (error) {
     res.status(500).json({ ok: false, mensaje: 'Error al buscar en Steam', error: error.message });
   }
@@ -57,6 +65,15 @@ const getSteamGameDetail = async (req, res) => {
     }
 
     const info = appData.data;
+
+    // 3. Bloquear consolas, hardware, DLCs o videos antes de guardar en MongoDB
+    if (info.type !== 'game' || esHardwarePorNombre(info.name)) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: `El elemento "${info.name}" no es un videojuego (tipo: ${info.type}).`
+      });
+    }
+
     const nuevoJuego = new Game({
       steamAppId: Number(appid),
       titulo: info.name,
@@ -84,7 +101,6 @@ const getPopularSteamGames = async (req, res) => {
     const response = await fetch(url);
     const data = await response.json();
 
-    const hardwareRegex = /steam deck|valve index|docking station|steam controller|steam link|vr headset/i;
     const idsVistos = new Set();
 
     const candidatos = [
@@ -96,7 +112,7 @@ const getPopularSteamGames = async (req, res) => {
       .filter((item) => {
         if (!item || !item.id || idsVistos.has(item.id)) return false;
         if (item.type !== undefined && item.type !== 0) return false;
-        if (hardwareRegex.test(item.name || '')) return false;
+        if (esHardwarePorNombre(item.name || '')) return false;
 
         idsVistos.add(item.id);
         return true;
