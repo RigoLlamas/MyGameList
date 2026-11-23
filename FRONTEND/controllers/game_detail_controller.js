@@ -42,6 +42,32 @@ function mostrarJuego(juego) {
     document.getElementById('detail_favorites').textContent = juego.numeroFavoritos.toLocaleString('es-MX');
 }
 
+// Pide y muestra las estadísticas de la comunidad
+async function cargarEstadisticas() {
+    try {
+        const response = await fetch(`${API_URL}/games/${juegoId}/stats`);
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.mensaje);
+
+        const stats = result.estadisticas;
+        document.getElementById('stats_playing').textContent = stats.jugando;
+        document.getElementById('stats_completed').textContent = stats.completados;
+        document.getElementById('stats_planned').textContent = stats.planeados;
+        document.getElementById('stats_dropped').textContent = stats.abandonados;
+
+        const rating = document.getElementById('stats_rating');
+        if (stats.calificacionMedia === null) {
+            rating.textContent = 'Sin calificaciones';
+        } else {
+            rating.innerHTML = `${stats.calificacionMedia}/10 <i class="bi bi-star-fill text-warning"></i> ` +
+                `<span class="small">(${stats.totalCalificaciones} votos)</span>`;
+        }
+    } catch (err) {
+        console.error('Error en estadísticas:', err);
+        document.getElementById('stats_rating').textContent = 'No disponible';
+    }
+}
+
 async function cargarDetalle() {
     if (!juegoId) {
         detailTitle.textContent = 'No se indicó ningún juego';
@@ -59,6 +85,7 @@ async function cargarDetalle() {
 
         juegoActual = result.juego;
         mostrarJuego(juegoActual);
+        cargarEstadisticas();
     } catch (err) {
         console.error('Error en detalle:', err);
         detailTitle.textContent = 'Juego no encontrado';

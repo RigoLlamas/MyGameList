@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const Game = require('../models/game');
 const Genre = require('../models/genre');
 const Platform = require('../models/platform');
+const UserGame = require('../models/user_game')
 
 // Mapa de plataformas conocidas con colores y nombres descriptivos
 const MAPA_PLATAFORMAS = {
@@ -318,11 +319,62 @@ const syncSteamCatalog = async (req, res) => {
   }
 };
 
+// GET /api/games/:id/stats — estadísticas de la comunidad para un juego
+const getGameStats = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ ok: false, mensaje: 'ID de juego no válido.' });
+    }
+
+    const juego = await Game.findById(id);
+    if (!juego) {
+      return res.status(404).json({ ok: false, mensaje: 'Videojuego no encontrado.' });
+    }
+
+    // Registros de Mi Lista de TODOS los usuarios que tienen este juego
+    const filtro = { $or: [{ juegoId: juego._id }] };
+    if (juego.steamAppId) filtro.$or.push({ steamAppId: juego.steamAppId });
+    const registros = await UserGame.find(filtro);
+
+    // Contar por estado y promediar calificaciones
+    const conteo = { playing: 0, completed: 0, planned: 0, dropped: 0 };
+    let sumaCalificaciones = 0;
+    let totalCalificaciones = 0;
+
+    registros.forEach(registro => {
+      conteo[registro.estado]++;
+      if (registro.calificacion !== null) {
+        sumaCalificaciones += registro.calificacion;
+        totalCalificaciones++;
+      }
+    });
+
+    res.json({
+      ok: true,
+      estadisticas: {
+        totalEnListas: registros.length,
+        jugando: conteo.playing,
+        completados: conteo.completed,
+        planeados: conteo.planned,
+        abandonados: conteo.dropped,
+        calificacionMedia: totalCalificaciones > 0
+          ? Number((sumaCalificaciones / totalCalificaciones).toFixed(1))
+          : null,
+        totalCalificaciones
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ ok: false, mensaje: 'Error al obtener estadísticas', error: error.message });
+  }
+};
+
 module.exports = {
   getGames,
   getGameById,
   createGame,
   syncSteamCatalog,
   asegurarGenerosYPlataformas,
-  MAPA_PLATAFORMAS
+  MAPA_PLATAFORMAS,
+  getGameStats
 };
