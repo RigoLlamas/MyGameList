@@ -18,8 +18,8 @@ function escapeHTML(texto) {
 // Genera el HTML de UNA tarjeta a partir de un juego de la BD
 function crearTarjeta(juego) {
     const imagen = juego.caratula
-        ? `<img src="${escapeHTML(juego.caratula)}" class="card-img-top rounded-top-3" alt="${escapeHTML(juego.titulo)}" style="aspect-ratio: 4/5; object-fit: cover;">`
-        : `<div class="img-placeholder text-secondary rounded-top-3"><i class="bi bi-image fs-1 opacity-50"></i></div>`;
+        ? `<img src="${juego.caratula}" class="card-img-top rounded-top-3" style="aspect-ratio: 16 / 9; object-fit: cover;" alt="${juego.titulo}">`
+        : `<div class="img-placeholder text-secondary rounded-top-3" style="aspect-ratio: 16 / 9;"><i class="bi bi-image fs-1 opacity-50"></i></div>`;
 
     const generos = juego.generos.slice(0, 2).join(', ');          // máximo 2 para que no se desborde
     const plataformas = juego.plataformas
@@ -79,7 +79,7 @@ async function cargarCatalogo() {
             page: pagina_actual,
             limit: 8
         });
-        const response = await fetch (`${API_URL}/games?${params}`);
+        const response = await fetch(`${API_URL}/games?${params}`);
         const result = await response.json();
 
         if (!response.ok) {
@@ -103,15 +103,15 @@ async function cargarCatalogo() {
     }
 }
 //Cuando cambia un filtro, se regresa a la pagina 1 y se recarga
-function aplicarFiltros(){
+function aplicarFiltros() {
     pagina_actual = 1;
     cargarCatalogo()
 }
 
 // Busqueda: espera a que el usuario deje de escribir 400 ms antes de bussacar
 let temporizador_busqueda;
-if(catalogSearch){
-    catalogSearch.addEventListener('input', ()=>{
+if (catalogSearch) {
+    catalogSearch.addEventListener('input', () => {
         clearTimeout(temporizador_busqueda);
         temporizador_busqueda = setTimeout(aplicarFiltros, 400);
     });
@@ -119,7 +119,7 @@ if(catalogSearch){
 
 // Selects: recargan en cuanto cambian
 [catalogGenre, catalogPlatform, catalogSort].forEach(select => {
-    if(select) select.addEventListener('change', aplicarFiltros);
+    if (select) select.addEventListener('change', aplicarFiltros);
 });
 
 // Paginación: un solo listener para todos los botones

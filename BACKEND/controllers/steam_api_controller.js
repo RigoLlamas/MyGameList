@@ -94,7 +94,7 @@ const getSteamGameDetail = async (req, res) => {
   }
 };
 
-// GET /api/steam/popular (Para Juegos Populares en index.html)
+// GET /api/steam/popular (Para Juegos Populares y Lanzamientos Recientes en index.html)
 const getPopularSteamGames = async (req, res) => {
   try {
     const url = 'https://store.steampowered.com/api/featuredcategories?l=spanish';
@@ -103,28 +103,34 @@ const getPopularSteamGames = async (req, res) => {
 
     const idsVistos = new Set();
 
-    const candidatos = [
+    const filtrarJuegos = (items = [], limite = 5) => {
+      return items
+        .filter((item) => {
+          if (!item || !item.id || idsVistos.has(item.id)) return false;
+          if (item.type !== undefined && item.type !== 0) return false;
+          if (esHardwarePorNombre(item.name || '')) return false;
+
+          idsVistos.add(item.id);
+          return true;
+        })
+        .slice(0, limite)
+        .map((item) => ({
+          steamAppId: item.id,
+          titulo: item.name,
+          caratula: item.large_capsule_image || item.header_image
+        }));
+    };
+
+    // Combinamos top_sellers con specials por si el filtro de hardware deja menos de 5
+    const candidatosPopulares = [
       ...(data.top_sellers?.items || []),
-      ...(data.new_releases?.items || [])
+      ...(data.specials?.items || [])
     ];
 
-    const populares = candidatos
-      .filter((item) => {
-        if (!item || !item.id || idsVistos.has(item.id)) return false;
-        if (item.type !== undefined && item.type !== 0) return false;
-        if (esHardwarePorNombre(item.name || '')) return false;
+    const populares = filtrarJuegos(candidatosPopulares, 5);
+    const recientes = filtrarJuegos(data.new_releases?.items, 4);
 
-        idsVistos.add(item.id);
-        return true;
-      })
-      .slice(0, 8)
-      .map((item) => ({
-        steamAppId: item.id,
-        titulo: item.name,
-        caratula: item.large_capsule_image || item.header_image
-      }));
-
-    res.json({ ok: true, juegos: populares });
+    res.json({ ok: true, juegos: populares, recientes });
   } catch (error) {
     res.status(500).json({ ok: false, mensaje: 'Error al obtener populares de Steam', error: error.message });
   }

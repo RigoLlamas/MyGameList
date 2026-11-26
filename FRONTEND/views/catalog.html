@@ -82,96 +82,12 @@
       </div>
     </div>
 
-    <!-- Grilla de Juegos (Hardcoded) -->
-    <div id="catalog_grid" class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 mb-5">
-    </div>
-
     <!-- Componente de Paginación -->
     <nav aria-label="Navegación del catálogo">
       <ul id="catalog_pagination" class="pagination justify-content-center">
       </ul>
     </nav>
   </main>
-
-  <!-- ==================== MODALES CRUD (TAXONOMÍAS) ==================== -->
-
-  <!-- Modal 1: CRUD Géneros -->
-  <div class="modal fade" id="modalGeneros" tabindex="-1" aria-labelledby="modalGenerosLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-header-title fw-bold" id="modalGenerosLabel">Gestionar Géneros</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form class="mb-4">
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Nuevo Género</label>
-              <input type="text" class="form-control" placeholder="Ej. Roguelike, Estrategia...">
-            </div>
-            <button type="button" class="btn btn-primary w-100">Crear Género</button>
-          </form>
-          
-          <h6 class="fw-bold mb-3">Géneros Existentes</h6>
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              Aventura
-              <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              Acción
-              <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              RPG
-              <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal 2: CRUD Plataformas (con selector de color) -->
-  <div class="modal fade" id="modalPlataformas" tabindex="-1" aria-labelledby="modalPlataformasLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-header-title fw-bold" id="modalPlataformasLabel">Gestionar Plataformas</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form class="mb-4">
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Nombre de Plataforma</label>
-              <input type="text" class="form-control" placeholder="Ej. PlayStation 5, PC...">
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Color asignado (Badge)</label>
-              <input type="color" class="form-control form-control-color w-100" value="#0369a1" title="Elige un color">
-            </div>
-            <button type="button" class="btn btn-primary w-100">Crear Plataforma</button>
-          </form>
-
-          <h6 class="fw-bold mb-3">Plataformas Existentes</h6>
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <span><span class="badge badge-switch me-2">Switch</span> Nintendo Switch</span>
-              <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <span><span class="badge badge-pc me-2">PC</span> PC Master Race</span>
-              <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <span><span class="badge badge-ps5 me-2">PS5</span> PlayStation 5</span>
-              <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <!-- Loading -->
