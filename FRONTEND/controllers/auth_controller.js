@@ -71,7 +71,8 @@ function logout() {
 // ==================== REGISTRO DE USUARIO ====================
 async function register(event) {
     event.preventDefault();
-    const data = Object.fromEntries(new FormData(event.target).entries());
+    const formData = new FormData(event.target);            // se envía tal cual (incluye la foto)
+    const data = Object.fromEntries(formData.entries());    // solo para validar
 
     // Validaciones acordes al esquema de Mongoose
     if (!data.nombre || !data.nombre.trim()) {
@@ -90,18 +91,18 @@ async function register(event) {
         alert('Ingresa una fecha de nacimiento válida y no futura.');
         return;
     }
-
-    // Si fotoPerfil viene como objeto File vacío desde un <input type="file">, se limpia para que Mongoose aplique default: ''
-    if (data.fotoPerfil && typeof data.fotoPerfil !== 'string') {
-        delete data.fotoPerfil;
+    // data.fotoPerfil es un File (size 0 si no eligió imagen; la foto es opcional)
+    if (data.fotoPerfil && data.fotoPerfil.size > 1024 * 1024) {
+        alert('La imagen no puede pesar más de 1 MB.');
+        return;
     }
 
     mostrarCarga('Creando cuenta...');
     try {
         const response = await fetch(`${BASE_API}/auth/register`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
+            // Sin 'Content-Type': el navegador lo pone solo (multipart/form-data)
+            body: formData
         });
 
         if (!response.ok) {
@@ -128,11 +129,12 @@ function populateModal() {
     const usuario = JSON.parse(sessionStorage.user);
 
     const inputNombre = document.getElementById('inputUsername');
-    const inputFoto = document.getElementById('inputAvatar');
     const inputFecha = document.getElementById('inputBirthdate');
 
     if (inputNombre) inputNombre.value = usuario.nombre || '';
-    if (inputFoto && inputFoto.type !== 'file') inputFoto.value = usuario.fotoPerfil || '';
+    // Cada vez que se abre el modal, la foto empieza sin archivo y sin "Quitar foto"
+    document.getElementById('inputAvatar').value = '';
+    document.getElementById('inputQuitarFoto').checked = false;
     if (inputFecha && usuario.fechaNacimiento) {
         inputFecha.value = usuario.fechaNacimiento.slice(0, 10);
     }
@@ -153,21 +155,24 @@ async function updateUser(event) {
     if (!sessionStorage.user) return;
 
     const usuario = JSON.parse(sessionStorage.user);
-    const data = Object.fromEntries(new FormData(event.target).entries());
+    // FormData incluye la imagen del <input type="file">; multer la recibe en el backend
+    const data = new FormData(event.target);
+    const foto = data.get('fotoPerfil');      // objeto File (size 0 si no eligió nada)
 
-    if (data.fotoPerfil && typeof data.fotoPerfil !== 'string') {
-        delete data.fotoPerfil;
+    if (data.get('quitarFoto')) {
+        data.delete('fotoPerfil');            // quitar tiene prioridad sobre subir
+    } else if (foto && foto.size > 1024 * 1024) {
+        alert('La imagen no puede pesar más de 1 MB.');
+        return;
     }
 
     mostrarCarga('Guardando cambios...');
     try {
         const response = await fetch(`${BASE_API}/users/${usuario._id}`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-user-id': usuario._id
-            },
-            body: JSON.stringify(data)
+            // Sin 'Content-Type': el navegador lo pone solo (multipart/form-data)
+            headers: { 'x-user-id': usuario._id },
+            body: data
         });
 
         if (!response.ok) {
@@ -261,7 +266,7 @@ function init() {
 
             if (usuario.fotoPerfil) {
                 avatarEl.onerror = mostrarPlaceholder;      // si el link está roto, regresa el ícono
-                avatarEl.src = usuario.fotoPerfil;
+                avatarEl.src = ORIGIN + usuario.fotoPerfil;   // la BD guarda '/uploads/...', falta el servidor
                 avatarEl.classList.remove('d-none');
                 placeholderEl?.classList.add('d-none');
             } else {

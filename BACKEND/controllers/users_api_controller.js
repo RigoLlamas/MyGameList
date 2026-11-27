@@ -1,6 +1,7 @@
 // BACKEND/controllers/users_api_controller.js
 const mongoose = require('mongoose');
 const User = require('../models/user');
+const { borrarFoto } = require('../middleware/subir_foto');
 
 // GET /api/users/:id
 const getUserById = async (req, res) => {
@@ -23,21 +24,33 @@ const getUserById = async (req, res) => {
 
 // PUT /api/users/:id (Actualizar foto de perfil, fecha de nacimiento o nombre)
 const updateUser = async (req, res) => {
+  // Si multer guardó una imagen nueva, esta es su ruta pública
+  const fotoNueva = req.file ? '/uploads/' + req.file.filename : null;
+
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
+      borrarFoto(fotoNueva);
       return res.status(400).json({ ok: false, mensaje: 'ID de usuario no válido.' });
     }
 
-    const { nombre, fechaNacimiento, fotoPerfil } = req.body;
+    const { nombre, fechaNacimiento, quitarFoto } = req.body;
     const cambios = {};
 
     if (nombre !== undefined) cambios.nombre = nombre;
     if (fechaNacimiento !== undefined) cambios.fechaNacimiento = fechaNacimiento;
-    if (fotoPerfil !== undefined) cambios.fotoPerfil = fotoPerfil;
+    if (fotoNueva) cambios.fotoPerfil = fotoNueva;              // subió una imagen
+    else if (quitarFoto) cambios.fotoPerfil = '';               // marcó "Quitar foto"
 
     if (Object.keys(cambios).length === 0) {
       return res.status(400).json({ ok: false, mensaje: 'No se enviaron campos para actualizar.' });
+    }
+
+    // Se busca antes de actualizar para saber cuál era la foto anterior
+    const usuarioAnterior = await User.findById(id);
+    if (!usuarioAnterior) {
+      borrarFoto(fotoNueva);
+      return res.status(404).json({ ok: false, mensaje: 'Usuario no encontrado.' });
     }
 
     const usuarioActualizado = await User.findByIdAndUpdate(
@@ -46,9 +59,8 @@ const updateUser = async (req, res) => {
       { returnDocument: 'after', runValidators: true }
     );
 
-    if (!usuarioActualizado) {
-      return res.status(404).json({ ok: false, mensaje: 'Usuario no encontrado.' });
-    }
+    // Solo después de guardar con éxito se borra la foto anterior del disco
+    if (cambios.fotoPerfil !== undefined) borrarFoto(usuarioAnterior.fotoPerfil);
 
     res.json({
       ok: true,
@@ -56,6 +68,7 @@ const updateUser = async (req, res) => {
       usuario: usuarioActualizado
     });
   } catch (error) {
+    borrarFoto(fotoNueva);   // si falló, la imagen nueva no se usa
     const primerError = error.errors
       ? Object.values(error.errors)[0].message
       : 'Error al actualizar el perfil.';
@@ -75,6 +88,8 @@ const deleteUser = async (req, res) => {
     if (!usuarioEliminado) {
       return res.status(404).json({ ok: false, mensaje: 'Usuario no encontrado.' });
     }
+
+    borrarFoto(usuarioEliminado.fotoPerfil);
 
     // Quitar al usuario eliminado de las listas de amigos de los demás
     await User.updateMany({ amigos: id }, { $pull: { amigos: id } });

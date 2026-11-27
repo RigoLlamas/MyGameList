@@ -126,12 +126,11 @@
                                     <input id="register_birthday" type="date" class="form-control" name="fechaNacimiento" required="true"><br>
                                 </div>
                             </div>
-                            <!--Foto de perfil-->
+                            <!--Foto de perfil (opcional)-->
                             <div class="mb-3">
-                                <label for="register_picture" class="form-label fw-semibold small"> Foto de Perfil (opcional)</label>
-                                <div class="input-group">
-                                    <input type="url" id="register_picture" class="form-control" name="fotoPerfil" placeholder="https://ejemplo.com/mi-foto.jpg">
-                                </div>
+                                <label for="register_picture" class="form-label fw-semibold small">Foto de Perfil (opcional)</label>
+                                <input id="register_picture" type="file" accept="image/*" class="form-control" name="fotoPerfil">
+                                <div class="form-text small">Máximo 1 MB por imagen.</div>
                             </div>
                         <p class="card-text text-center">
                             <input type="submit" class="form-control btn btn-primary  rounded-pill px-4" value="Crear Cuenta">

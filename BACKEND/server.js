@@ -17,6 +17,9 @@ app.use(express.urlencoded({ extended: true }));
 // Archivos estáticos del frontend
 app.use(express.static(path.join(__dirname, '../FRONTEND')));
 
+//Para subir imagenes
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // 2. Rutas de vistas HTML
 app.get('/', (req, res) => {
     res.redirect('/views/index.html');

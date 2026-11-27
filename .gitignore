@@ -150,3 +150,5 @@ vite.config.ts.timestamp-*
 
 # Test
  *.http
+# Imágenes subidas por los usuarios
+BACKEND/uploads/

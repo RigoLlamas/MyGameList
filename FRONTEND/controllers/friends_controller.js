@@ -34,7 +34,7 @@ async function pedirAPI(ruta, metodo = 'GET') {
     return result;
 }
 
-// Foto circular del usuario; si no tiene foto o el link está roto, muestra el ícono
+// Foto circular del usuario; si no tiene foto o la imagen no carga, muestra el ícono
 function avatarHTML(usuario) {
     const icono = `
         <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center flex-shrink-0 ${usuario.fotoPerfil ? 'd-none' : ''}"
@@ -45,7 +45,7 @@ function avatarHTML(usuario) {
     if (!usuario.fotoPerfil) return icono;
 
     return `
-        <img src="${escaparHTML(usuario.fotoPerfil)}" alt="" class="rounded-circle flex-shrink-0"
+        <img src="${ORIGIN + escaparHTML(usuario.fotoPerfil)}" alt="" class="rounded-circle flex-shrink-0"
              style="width: 48px; height: 48px; object-fit: cover;"
              onerror="this.classList.add('d-none'); this.nextElementSibling.classList.remove('d-none');">
         ${icono}`;

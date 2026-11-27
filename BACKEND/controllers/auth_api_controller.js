@@ -1,13 +1,18 @@
 // BACKEND/controllers/auth_api_controller.js
 const User = require('../models/user');
+const { borrarFoto } = require('../middleware/subir_foto');
 
 // POST /api/auth/register
 const registerUser = async (req, res) => {
+  // Si eligió foto, multer ya la guardó; esta es su ruta pública (si no, queda '')
+  const fotoPerfil = req.file ? '/uploads/' + req.file.filename : '';
+
   try {
-    const { nombre, email, password, fechaNacimiento, fotoPerfil } = req.body;
+    const { nombre, email, password, fechaNacimiento } = req.body;
 
     const existeCorreo = await User.findOne({ email: email?.toLowerCase().trim() });
     if (existeCorreo) {
+      borrarFoto(fotoPerfil);   // no se creó la cuenta: la imagen sobra
       return res.status(400).json({ ok: false, mensaje: 'Ese correo electrónico ya está registrado.' });
     }
 
@@ -16,7 +21,7 @@ const registerUser = async (req, res) => {
       email,
       password,
       fechaNacimiento,
-      fotoPerfil: fotoPerfil || ''
+      fotoPerfil
     });
 
     await nuevoUsuario.save();
@@ -28,6 +33,7 @@ const registerUser = async (req, res) => {
       usuario: nuevoUsuario
     });
   } catch (error) {
+    borrarFoto(fotoPerfil);   // no se creó la cuenta: la imagen sobra
     // Captura errores de validación de Mongoose (ej. contraseña < 8 caracteres)
     const primerError = error.errors
       ? Object.values(error.errors)[0].message
