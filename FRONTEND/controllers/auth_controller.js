@@ -183,8 +183,8 @@ async function updateUser(event) {
         sessionStorage.setItem('user', JSON.stringify(result.usuario));
 
         bootstrap.Modal.getInstance(modalEdit)?.hide();
-        init();
         alert('Perfil actualizado correctamente.');
+        window.location.reload();   // recarga para que el perfil y la navbar muestren los datos nuevos
     } catch (err) {
         console.error('Error en la edición:', err);
         alert('No se pudo actualizar: ' + err.message);

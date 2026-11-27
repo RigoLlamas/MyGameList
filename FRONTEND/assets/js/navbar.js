@@ -32,11 +32,21 @@ function renderNavbar() {
         `
         : '';
 
-    const botonSesion = sessionStorage.getItem('user')
+    // Foto de perfil del usuario en sesión, o el ícono si no tiene (o si la imagen no carga)
+    const usuario = JSON.parse(sessionStorage.getItem('user') || 'null');
+    const icono = `<i class="bi bi-person-circle fs-3 me-2 ${usuario?.fotoPerfil ? 'd-none' : ''}"></i>`;
+    const avatar = usuario?.fotoPerfil
+        ? `<img src="${ORIGIN + usuario.fotoPerfil}" alt="Foto de perfil" class="rounded-circle me-2"
+                style="width: 36px; height: 36px; object-fit: cover;"
+                onerror="this.classList.add('d-none'); this.nextElementSibling.classList.remove('d-none');">
+           ${icono}`
+        : icono;
+
+    const botonSesion = usuario
         ? `
             <div class="dropdown">
                 <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle active border-bottom border-primary border-2" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-person-circle fs-3 me-2"></i>
+                    ${avatar}
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="dropdownUser">
                     <li><a class="dropdown-item ${paginaActual === 'profile.html' ? 'active' : ''}" href="${base}profile.html">Ver Perfil</a></li>
