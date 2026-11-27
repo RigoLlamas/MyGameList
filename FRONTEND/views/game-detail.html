@@ -35,8 +35,17 @@
       <!-- Encabezado del Juego -->
       <div class="row align-items-start mb-4">
         <div class="col-auto">
-          <div id="detail_cover" class="cover-placeholder text-secondary">
-            <i class="bi bi-image fs-1 opacity-50"></i>
+          <!-- position-relative: el corazón se acomoda encima de la portada -->
+          <div class="position-relative">
+            <div id="detail_cover" class="cover-placeholder text-secondary">
+              <i class="bi bi-image fs-1 opacity-50"></i>
+            </div>
+            <!-- Botón de favorito (esquina superior izquierda de la portada) -->
+            <button id="btn_favorite" type="button" title="Agregar a favoritos"
+              class="btn p-0 border-0 bg-transparent position-absolute top-0 start-0 m-2"
+              style="filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.8));">
+              <i id="icon_favorite" class="bi bi-heart fs-2 text-white"></i>
+            </button>
           </div>
         </div>
         <div class="col">

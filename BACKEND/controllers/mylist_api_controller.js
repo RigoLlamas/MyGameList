@@ -138,7 +138,7 @@ const addGameToMyList = async (req, res) => {
       titulo,
       caratula,
       plataforma,
-      estado = 'playing',
+      estado = 'completed',
       horasJugadas = 0,
       progreso = 0,
       calificacion = null,

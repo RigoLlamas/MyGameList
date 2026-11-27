@@ -35,7 +35,7 @@ const userGameSchema = new mongoose.Schema({
   estado: {
     type: String,
     enum: ['playing', 'completed', 'planned', 'dropped'],
-    default: 'playing'
+    default: 'completed'
   },
   horasJugadas: {
     type: Number,

@@ -164,13 +164,14 @@ async function verificarEstadoEnMiLista() {
     if (encontrado) {
       itemEnMiLista = encontrado;
       actualizarBotonLista(encontrado.estado);
+      actualizarCorazon(encontrado.esFavorito);
     }
   } catch (err) {
     console.error('Error al verificar estado en mi lista:', err);
   }
 }
 
-async function agregarAMiLista(estado = 'playing') {
+async function agregarAMiLista(estado = 'completed') {
   const user = JSON.parse(sessionStorage.getItem('user') || 'null');
   if (!user) {
     alert('Inicia sesión para agregar juegos a tu lista.');
@@ -237,11 +238,88 @@ async function agregarAMiLista(estado = 'playing') {
   }
 }
 
+// ==================== FAVORITO (corazón sobre la portada) ====================
+// Contorno blanco = no es favorito; corazón rojo relleno = es favorito
+function actualizarCorazon(esFavorito) {
+  const icono = document.getElementById('icon_favorite');
+  const boton = document.getElementById('btn_favorite');
+  if (!icono || !boton) return;
+
+  icono.className = esFavorito
+    ? 'bi bi-heart-fill fs-2 text-danger'
+    : 'bi bi-heart fs-2 text-white';
+  boton.title = esFavorito ? 'Quitar de favoritos' : 'Agregar a favoritos';
+}
+
+async function alternarFavorito() {
+  const user = JSON.parse(sessionStorage.getItem('user') || 'null');
+  if (!user) {
+    alert('Inicia sesión para agregar juegos a favoritos.');
+    window.location.href = 'login.html';
+    return;
+  }
+  if (!juegoActual) {
+    alert('Espera a que termine de cargar la información del juego.');
+    return;
+  }
+
+  const boton = document.getElementById('btn_favorite');
+  boton.disabled = true;      // evita doble clic mientras responde el servidor
+  try {
+    let response;
+
+    if (itemEnMiLista && itemEnMiLista._id) {
+      // Ya está en Mi Lista: solo se alterna el favorito
+      response = await fetch(`${API_URL}/mylist/${itemEnMiLista._id}/favorite`, { method: 'PATCH' });
+    } else {
+      // No está en Mi Lista: se agrega ya marcado como favorito
+      const plataformaPrincipal = Array.isArray(juegoActual.plataformas) && juegoActual.plataformas.length > 0
+        ? juegoActual.plataformas[0]
+        : 'PC';
+
+      response = await fetch(`${API_URL}/mylist`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          usuarioId: user._id,
+          juegoId: juegoActual._id,
+          steamAppId: juegoActual.steamAppId,
+          titulo: juegoActual.titulo,
+          caratula: juegoActual.caratula || '',
+          plataforma: plataformaPrincipal,
+          estado: 'completed',
+          esFavorito: true
+        })
+      });
+    }
+
+    const result = await response.json();
+    if (!response.ok || !result.ok) {
+      throw new Error(result.mensaje || 'No se pudo actualizar favoritos.');
+    }
+
+    itemEnMiLista = result.juego;
+    actualizarCorazon(itemEnMiLista.esFavorito);
+    actualizarBotonLista(itemEnMiLista.estado);
+
+    // Actualiza el "Número de favoritos" sin recargar la página
+    juegoActual.numeroFavoritos = Math.max(0, (juegoActual.numeroFavoritos ?? 0) + (itemEnMiLista.esFavorito ? 1 : -1));
+    document.getElementById('detail_favorites').textContent = juegoActual.numeroFavoritos.toLocaleString('es-MX');
+  } catch (err) {
+    console.error('Error en favorito:', err);
+    alert(err.message);
+  } finally {
+    boton.disabled = false;
+  }
+}
+
 function inicializarEventosLista() {
+  document.getElementById('btn_favorite')?.addEventListener('click', alternarFavorito);
+
   const btnPrincipal = document.getElementById('btn_add_mylist') || document.querySelector('main .btn-group > button:first-child');
   if (btnPrincipal) {
     btnPrincipal.addEventListener('click', () => {
-      const estadoActual = itemEnMiLista ? itemEnMiLista.estado : 'playing';
+      const estadoActual = itemEnMiLista ? itemEnMiLista.estado : 'completed';
       agregarAMiLista(estadoActual);
     });
   }
@@ -259,7 +337,7 @@ function inicializarEventosLista() {
       e.preventDefault();
       const estadoData = item.dataset.estado;
       const texto = item.textContent.trim().toLowerCase();
-      const estado = estadoData || mapaEstados[texto] || 'playing';
+      const estado = estadoData || mapaEstados[texto] || 'completed';
       agregarAMiLista(estado);
     });
   });
