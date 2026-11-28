@@ -234,6 +234,14 @@ function init() {
     const vistaActual = typeof page !== 'undefined' ? page : window.location.pathname.split('/').pop();
 
     if (vistaActual === 'profile.html') {
+        const params = new URLSearchParams(window.location.search);
+        const idAjeno = params.get('id');
+
+        // Si es el perfil de otro usuario, profile_controller.js se encarga de cargarlo
+        if (idAjeno && idAjeno !== usuario._id && idAjeno !== usuario.id) {
+            return;
+        }
+
         const nameEl = document.getElementById('user_name');
         const joinedEl = document.getElementById('user_joined_at');
         const bdayEl = document.getElementById('user_birthday');

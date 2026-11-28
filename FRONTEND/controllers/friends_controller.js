@@ -68,12 +68,21 @@ function tarjetaUsuario(usuario) {
         <div class="col">
             <div class="card border rounded-3 p-3 h-100 shadow-sm">
                 <div class="d-flex align-items-center gap-3">
-                    ${avatarHTML(usuario)}
+                    <a href="profile.html?id=${usuario._id}" class="text-decoration-none">
+                        ${avatarHTML(usuario)}
+                    </a>
                     <div class="flex-grow-1 text-truncate">
-                        <h6 class="fw-bold mb-0 text-truncate">${escaparHTML(usuario.nombre)}</h6>
+                        <a href="profile.html?id=${usuario._id}" class="text-decoration-none text-dark fw-bold mb-0 text-truncate d-block hover-primary">
+                            ${escaparHTML(usuario.nombre)}
+                        </a>
                     </div>
                 </div>
-                <div class="mt-3 pt-2 border-top">${boton}</div>
+                <div class="mt-3 pt-2 border-top d-flex justify-content-between align-items-center">
+                    <a href="profile.html?id=${usuario._id}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                        <i class="bi bi-eye me-1"></i>Ver perfil
+                    </a>
+                    ${boton}
+                </div>
             </div>
         </div>`;
 }

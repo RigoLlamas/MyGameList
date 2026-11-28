@@ -11,7 +11,9 @@ const getUserById = async (req, res) => {
       return res.status(400).json({ ok: false, mensaje: 'ID de usuario no válido.' });
     }
 
-    const usuario = await User.findById(id).populate('favoritos');
+    const usuario = await User.findById(id)
+      .select('-password')
+      .populate('favoritos');
     if (!usuario) {
       return res.status(404).json({ ok: false, mensaje: 'Usuario no encontrado.' });
     }
